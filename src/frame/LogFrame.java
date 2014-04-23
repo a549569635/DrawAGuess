@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import panel.BackgroundPane;
+import panel.BackgroundLabel;
 import core.Driver;
 
 public class LogFrame extends JFrame {
@@ -47,8 +47,8 @@ public class LogFrame extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
 		ID = oriID;
 
-		BackgroundPane BGP = new BackgroundPane("src/image/LogBGP.jpg",400,300);
-		this.getRootPane().add(BGP,new Integer(Integer.MIN_VALUE));
+		BackgroundLabel BGL = new BackgroundLabel("src/image/LogBGP.jpg",400,300);
+		this.getRootPane().add(BGL,new Integer(Integer.MIN_VALUE));
 		
 		try {
 			BGMurl = new File("src/music/LogBGM.wav").toURI().toURL();

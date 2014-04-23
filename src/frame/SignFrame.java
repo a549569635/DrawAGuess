@@ -12,6 +12,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -19,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import panel.BackgroundPane;
+import panel.BackgroundLabel;
 
 public class SignFrame extends JFrame {
 
@@ -49,8 +50,8 @@ public class SignFrame extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
 		ID = oriID;
 		
-		BackgroundPane BGP = new BackgroundPane("src/image/SignBGP.jpg",450,600);
-		this.getRootPane().add(BGP,new Integer(Integer.MIN_VALUE));
+		BackgroundLabel BGL = new BackgroundLabel("src/image/SignBGP.jpg",450,600);
+		this.getRootPane().add(BGL,new Integer(Integer.MIN_VALUE));
 		
 		try {
 			BGMurl = new File("src/music/SignBGM.wav").toURI().toURL();

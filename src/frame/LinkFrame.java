@@ -11,7 +11,7 @@ import java.net.URL;
 
 import javax.swing.*;
 
-import panel.BackgroundPane;
+import panel.BackgroundLabel;
 import java.awt.Toolkit;
 
 public class LinkFrame extends JFrame {
@@ -38,8 +38,8 @@ public class LinkFrame extends JFrame {
 		setContentPane(contentPane);
 		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
 		
-		BackgroundPane BGP = new BackgroundPane("src/image/LinkBGP.jpg",300,200);
-		this.getRootPane().add(BGP,new Integer(Integer.MIN_VALUE));
+		BackgroundLabel BGL = new BackgroundLabel("src/image/LinkBGP.jpg",300,200);
+		this.getRootPane().add(BGL,new Integer(Integer.MIN_VALUE));
 		
 		try {
 			BGMurl = new File("src/music/LinkBGM.wav").toURI().toURL();
