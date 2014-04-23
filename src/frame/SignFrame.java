@@ -12,7 +12,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,9 +19,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import core.Driver;
+import panel.BackgroundPane;
 
-public class RegisterFrame extends JFrame {
+public class SignFrame extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField NicknameField;
@@ -37,19 +36,24 @@ public class RegisterFrame extends JFrame {
 	private URL BGMurl;
 	private AudioClip BGMclip;
 
-	public RegisterFrame(String oriID) {
+	public SignFrame(String oriID) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setTitle("注册");
+		setTitle("你画我猜-注册");
 		setResizable(false);
+		setLocation(250,80);
 		contentPane = new JPanel();
-		contentPane.setPreferredSize(new Dimension(450,300));
+		contentPane.setPreferredSize(new Dimension(450,600));
 		contentPane.setLayout(null);
+		contentPane.setOpaque(false);
 		setContentPane(contentPane);
-		setIconImage(Toolkit.getDefaultToolkit().getImage("image/Logo.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
 		ID = oriID;
 		
+		BackgroundPane BGP = new BackgroundPane("src/image/SignBGP.jpg",450,600);
+		this.getRootPane().add(BGP,new Integer(Integer.MIN_VALUE));
+		
 		try {
-			BGMurl = new File("music/RegisterBGM.wav").toURI().toURL();
+			BGMurl = new File("src/music/SignBGM.wav").toURI().toURL();
 		} catch (MalformedURLException e1) {
 			// TODO 自动生成的 catch 块
 		}
@@ -124,7 +128,7 @@ public class RegisterFrame extends JFrame {
 				ID = IDField.getText();
 				Password = String.valueOf(PasswordField.getPassword());
 				BGMclip.stop();
-				Driver.RegLog(ID,Password);
+				Log(ID,Password);
 			}
 		});
 		
@@ -146,4 +150,10 @@ public class RegisterFrame extends JFrame {
 		pack();
 	}
 	
+	private void Log(String ID,String Password){
+		setVisible(false);
+		dispose();
+		LogFrame Log = new LogFrame(ID);
+		Log.setVisible(true);
+	}
 }

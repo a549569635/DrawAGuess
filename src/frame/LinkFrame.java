@@ -2,10 +2,7 @@ package frame;
 
 import java.applet.Applet;
 import java.applet.AudioClip;
-import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -14,9 +11,7 @@ import java.net.URL;
 
 import javax.swing.*;
 
-import panel.BackgroundLabel;
-import core.Driver;
-
+import panel.BackgroundPane;
 import java.awt.Toolkit;
 
 public class LinkFrame extends JFrame {
@@ -32,53 +27,50 @@ public class LinkFrame extends JFrame {
 	private AudioClip BGMclip;
 	
 	public LinkFrame() {
-		setTitle("Link");
+		setTitle("你画我猜-Link");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
+		setLocation(350,200);
 		contentPane = new JPanel();
 		contentPane.setPreferredSize(new Dimension(300,200));
 		contentPane.setLayout(null);
 		contentPane.setOpaque(false);
 		setContentPane(contentPane);
-		setIconImage(Toolkit.getDefaultToolkit().getImage("image/Logo.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
 		
-		System.out.print(this.getContentPane().getHeight());
-		
-		BackgroundLabel BGL = new BackgroundLabel("image/LinkBGP.jpg",300,200);
-		this.getLayeredPane().add(BGL,new Integer(Integer.MIN_VALUE));
+		BackgroundPane BGP = new BackgroundPane("src/image/LinkBGP.jpg",300,200);
+		this.getRootPane().add(BGP,new Integer(Integer.MIN_VALUE));
 		
 		try {
-			BGMurl = new File("music/LinkBGM.wav").toURI().toURL();
+			BGMurl = new File("src/music/LinkBGM.wav").toURI().toURL();
 		} catch (MalformedURLException e1) {
 			// TODO 自动生成的 catch 块
 		}
 		BGMclip = Applet.newAudioClip(BGMurl);
-		BGMclip.play();
-		
-		TipLab = new JLabel("需要填一下服务器IP哟，么么哒~");
-		contentPane.add(TipLab);
-		TipLab.setBounds(40, 20, 260, 30);
-		
-		IPLab = new JLabel("IP:");
-		contentPane.add(IPLab);
-		IPLab.setBounds(30, 60, 30, 30);
 		
 		IPField = new JTextField("",1);
 		contentPane.add(IPField);
-		IPField.setBounds(60, 60, 200, 30);
+		IPField.setBounds(70, 85, 200, 30);
 		
 		SubButton = new JButton("Start！");
 		contentPane.add(SubButton);
-		SubButton.setBounds(40, 110, 80, 30);
+		SubButton.setBounds(40, 150, 80, 30);
 		SubButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
-				BGMclip.stop();
-				Driver.LinkLog();
+				BGMclip.play();
+				Log();
 			}		
 		});
 		
 		pack();
+	}
+	
+	private void Log(){
+		setVisible(false);
+		dispose();
+		LogFrame Log = new LogFrame("");
+		Log.setVisible(true);
 	}
 }

@@ -12,14 +12,13 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import panel.BackgroundPane;
 import core.Driver;
 
 public class LogFrame extends JFrame {
@@ -37,34 +36,31 @@ public class LogFrame extends JFrame {
 
 	public LogFrame(String oriID) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setTitle("登陆");
+		setTitle("你画我猜-登陆");
 		setResizable(false);
+		setLocation(300,200);
 		contentPane = new JPanel();
-		contentPane.setPreferredSize(new Dimension(450,300));
+		contentPane.setPreferredSize(new Dimension(400,300));
 		contentPane.setLayout(null);
+		contentPane.setOpaque(false);
 		setContentPane(contentPane);
-		setIconImage(Toolkit.getDefaultToolkit().getImage("image/Logo.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
 		ID = oriID;
+
+		BackgroundPane BGP = new BackgroundPane("src/image/LogBGP.jpg",400,300);
+		this.getRootPane().add(BGP,new Integer(Integer.MIN_VALUE));
 		
 		try {
-			BGMurl = new File("music/LogBGM.wav").toURI().toURL();
+			BGMurl = new File("src/music/LogBGM.wav").toURI().toURL();
 		} catch (MalformedURLException e1) {
 			// TODO 自动生成的 catch 块
 		}
 		BGMclip = Applet.newAudioClip(BGMurl);
 		BGMclip.loop();
 		
-		final JLabel IDLabel = new JLabel("账号：");
-		contentPane.add(IDLabel);
-		IDLabel.setBounds(100, 50, 50, 30);
-		
-		final JLabel PasswordLabel = new JLabel("密码：");
-		contentPane.add(PasswordLabel);
-		PasswordLabel.setBounds(100, 110, 50, 30);
-		
 		IDField = new JTextField(ID,1);
 		contentPane.add(IDField);
-		IDField.setBounds(150, 50, 200, 30);
+		IDField.setBounds(75, 135, 300, 25);
 		IDField.addFocusListener(new FocusListener(){  
             public void focusLost(FocusEvent e) {    
             	if(IDField.getText().equals("")){
@@ -84,34 +80,47 @@ public class LogFrame extends JFrame {
 		
 		PasswordField = new JPasswordField("",1);
 		contentPane.add(PasswordField);
-		PasswordField.setBounds(150, 110, 200, 30);
+		PasswordField.setBounds(75, 170, 300, 25);
 		
 		SubButton = new JButton("Start！");
 		contentPane.add(SubButton);
-		SubButton.setBounds(80, 190, 120, 40);
+		SubButton.setBounds(50, 240, 120, 30);
 		SubButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
 				Password = String.valueOf(PasswordField.getPassword());
 				BGMclip.stop();
-				Driver.LogHall(ID,Password);
+				Hall(ID,Password);
 			}		
 		});
 		
 		RegisterButton = new JButton("新人入伙");
 		contentPane.add(RegisterButton);
-		RegisterButton.setBounds(250, 190, 120, 40);
+		RegisterButton.setBounds(200, 240, 120, 30);
 		RegisterButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
 				BGMclip.stop();
-				Driver.LogReg(ID);
+				Sign();
 			}		
 		});
 		
 		pack();
 	}
 	
+	private void Sign(){
+		setVisible(false);
+		dispose();
+		SignFrame Sign = new SignFrame(ID);
+		Sign.setVisible(true);
+	}
+	
+	private void Hall(String ID, String Password){
+		setVisible(false);
+		dispose();
+		HallFrame hall = new HallFrame();
+		hall.setVisible(true);
+	}
 }
