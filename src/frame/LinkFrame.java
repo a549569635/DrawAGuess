@@ -11,8 +11,9 @@ import java.net.URL;
 
 import javax.swing.*;
 
-import panel.BackgroundLabel;
 import java.awt.Toolkit;
+
+import label.BackgroundLabel;
 
 public class LinkFrame extends JFrame {
 

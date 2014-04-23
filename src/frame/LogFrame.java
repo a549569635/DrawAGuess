@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import panel.BackgroundLabel;
+import label.BackgroundLabel;
 import core.Driver;
 
 public class LogFrame extends JFrame {

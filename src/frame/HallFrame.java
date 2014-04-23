@@ -9,7 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import panel.BackgroundLabel;
+import label.BackgroundLabel;
 
 public class HallFrame extends JFrame {
 

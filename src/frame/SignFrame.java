@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import panel.BackgroundLabel;
+import label.BackgroundLabel;
 
 public class SignFrame extends JFrame {
 
