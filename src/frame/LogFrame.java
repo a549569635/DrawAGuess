@@ -2,6 +2,7 @@ package frame;
 
 import java.applet.Applet;
 import java.applet.AudioClip;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,9 +38,9 @@ public class LogFrame extends JFrame {
 	public LogFrame(String oriID) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("登陆");
-		setBounds(100, 100, 450, 300);
 		setResizable(false);
 		contentPane = new JPanel();
+		contentPane.setPreferredSize(new Dimension(450,300));
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
 		setIconImage(Toolkit.getDefaultToolkit().getImage("image/Logo.png"));
@@ -94,7 +95,7 @@ public class LogFrame extends JFrame {
 				// TODO 自动生成的方法存根
 				Password = String.valueOf(PasswordField.getPassword());
 				BGMclip.stop();
-				Driver.Logcomplete(ID,Password);
+				Driver.LogHall(ID,Password);
 			}		
 		});
 		
@@ -106,9 +107,11 @@ public class LogFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
 				BGMclip.stop();
-				Driver.Logcomplete(ID);
+				Driver.LogReg(ID);
 			}		
 		});
+		
+		pack();
 	}
 	
 }

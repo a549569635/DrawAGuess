@@ -14,27 +14,27 @@ public class Driver {
 		Link.setVisible(true);
 	}
 	
-	public static void Linkcomplete(){
+	public static void LinkLog(){
 		Link.setVisible(false);
 		Link = null;
 		Log = new LogFrame("");
 		Log.setVisible(true);
 	}
 	
-	public static void Logcomplete(String ID, String Password){
+	public static void LogHall(String ID, String Password){
 		Log.setVisible(false);
 		Log = null;
 		
 	}
 	
-	public static void Logcomplete(String ID){
+	public static void LogReg(String ID){
 		Log.setVisible(false);
 		Log = null;
 		Register = new RegisterFrame(ID);
 		Register.setVisible(true);
 	}
 	
-	public static void Registercomplete(String ID,String Password){
+	public static void RegLog(String ID,String Password){
 		Register.setVisible(false);
 		Register = null;
 		Log = new LogFrame(ID);

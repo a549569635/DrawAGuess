@@ -4,6 +4,7 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,8 +14,9 @@ import java.net.URL;
 
 import javax.swing.*;
 
-import panel.BackgroundPanel;
+import panel.BackgroundLabel;
 import core.Driver;
+
 import java.awt.Toolkit;
 
 public class LinkFrame extends JFrame {
@@ -32,9 +34,9 @@ public class LinkFrame extends JFrame {
 	public LinkFrame() {
 		setTitle("Link");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 300, 200);
 		setResizable(false);
 		contentPane = new JPanel();
+		contentPane.setPreferredSize(new Dimension(300,200));
 		contentPane.setLayout(null);
 		contentPane.setOpaque(false);
 		setContentPane(contentPane);
@@ -42,8 +44,8 @@ public class LinkFrame extends JFrame {
 		
 		System.out.print(this.getContentPane().getHeight());
 		
-		BackgroundPanel BGP = new BackgroundPanel("image/LinkBGP.jpg",300,200);
-		this.getRootPane().add(BGP,new Integer(Integer.MIN_VALUE));
+		BackgroundLabel BGL = new BackgroundLabel("image/LinkBGP.jpg",300,200);
+		this.getLayeredPane().add(BGL,new Integer(Integer.MIN_VALUE));
 		
 		try {
 			BGMurl = new File("music/LinkBGM.wav").toURI().toURL();
@@ -73,9 +75,10 @@ public class LinkFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
 				BGMclip.stop();
-				Driver.Linkcomplete();
+				Driver.LinkLog();
 			}		
 		});
 		
+		pack();
 	}
 }

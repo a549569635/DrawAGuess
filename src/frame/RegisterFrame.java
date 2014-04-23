@@ -2,6 +2,7 @@ package frame;
 
 import java.applet.Applet;
 import java.applet.AudioClip;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,9 +40,9 @@ public class RegisterFrame extends JFrame {
 	public RegisterFrame(String oriID) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("зЂВс");
-		setBounds(100, 100, 450, 300);
 		setResizable(false);
 		contentPane = new JPanel();
+		contentPane.setPreferredSize(new Dimension(450,300));
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
 		setIconImage(Toolkit.getDefaultToolkit().getImage("image/Logo.png"));
@@ -123,7 +124,7 @@ public class RegisterFrame extends JFrame {
 				ID = IDField.getText();
 				Password = String.valueOf(PasswordField.getPassword());
 				BGMclip.stop();
-				Driver.Registercomplete(ID,Password);
+				Driver.RegLog(ID,Password);
 			}
 		});
 		
@@ -141,6 +142,8 @@ public class RegisterFrame extends JFrame {
 				RePasswordField.setText("");
 			}		
 		});
+		
+		pack();
 	}
 	
 }

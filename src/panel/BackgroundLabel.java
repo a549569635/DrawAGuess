@@ -4,13 +4,14 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class BackgroundPanel extends JPanel {
+public class BackgroundLabel extends JLabel {
 	
 	private Image BGP;
 
-	public BackgroundPanel(String ImgPath,int Length,int Width) {
+	public BackgroundLabel(String ImgPath,int Length,int Width) {
 		this.setLayout(null);
 		this.setBounds(0, 0, Length, Width);
 		
