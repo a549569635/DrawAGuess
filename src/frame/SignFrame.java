@@ -41,7 +41,6 @@ public class SignFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Äã»­ÎÒ²Â-×¢²á");
 		setResizable(false);
-		setLocation(250,80);
 		contentPane = new JPanel();
 		contentPane.setPreferredSize(new Dimension(450,600));
 		contentPane.setLayout(null);
@@ -149,6 +148,7 @@ public class SignFrame extends JFrame {
 		});
 		
 		pack();
+		setLocationRelativeTo(null);
 	}
 	
 	private void Log(String ID,String Password){

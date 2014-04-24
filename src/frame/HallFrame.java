@@ -22,7 +22,6 @@ public class HallFrame extends JFrame {
 		setTitle("Äã»­ÎÒ²Â-ÓÎÏ·´óÌü");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
-		setLocation(100,80);
 		contentPane = new JPanel();
 		contentPane.setPreferredSize(new Dimension(800,600));
 		contentPane.setLayout(null);
@@ -45,6 +44,7 @@ public class HallFrame extends JFrame {
 		});
 		
 		pack();
+		setLocationRelativeTo(null);
 	}
 
 }
