@@ -183,6 +183,13 @@ public class LogFrame extends JFrame {
 		setContentPane(LogingPane);
 	}
 	
+	private void Sign(){
+		setVisible(false);
+		dispose();
+		SignFrame Sign = new SignFrame();
+		Sign.setVisible(true);
+	}
+	
 	private void cancel(){
 		LogingBGL.setVisible(false);
 		LogBGL.setVisible(true);
@@ -192,12 +199,5 @@ public class LogFrame extends JFrame {
 		LogingPane.setVisible(false);
 		setContentPane(contentPane);
 		contentPane.setVisible(true);
-	}
-	
-	private void Sign(){
-		setVisible(false);
-		dispose();
-		SignFrame Sign = new SignFrame(ID);
-		Sign.setVisible(true);
 	}
 }

@@ -2,13 +2,22 @@ package frame;
 
 import java.applet.Applet;
 import java.applet.AudioClip;
+import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -18,39 +27,62 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import label.BackgroundLabel;
 
+import javax.swing.JCheckBox;
+
 public class SignFrame extends JFrame {
 
+	private BackgroundLabel SignBGL;
+	private BackgroundLabel SigningBGL;
 	private JPanel contentPane;
-	private JTextField NicknameField;
+	private JPanel SigningPane;
+	private JLabel SigningLabel;
+	private JTextField NickField;
 	private JTextField IDField;
-	private JPasswordField PasswordField;
-	private JPasswordField RePasswordField;
+	private JPasswordField PWField;
+	private JPasswordField RePWField;
+	private JTextField EmailField;
 	private JButton SubButton;
 	private JButton ResetButton;
-	
-	private String ID;
-	private String Password;
+	private JButton SigningButton;
+	private JLabel NickCheckL;
+	private JLabel IDCheckL;
+	private JLabel PWCheckL;
+	private JLabel RePWCheckL;
+	private JLabel EmailCheckL;
+	private JTextArea NickTipT;
+	private JTextArea IDTipT;
+	private JTextArea PWTipT;
+	private JTextArea RePWTipT;
+	private JTextArea EmailTipT;
+	private JCheckBox AMCheckBox;
+	private JLabel Agreement;
+
 	private URL BGMurl;
 	private AudioClip BGMclip;
+	private ImageIcon passTip = new ImageIcon("src/image/passTip.png");
+	private ImageIcon failTip = new ImageIcon("src/image/failTip.png");
+	
+	private String Nickname;
+	private String ID;
+	private String Password;
+	private String Email;
+	private Boolean Signing = false;
+	private Boolean Nickpassed = false;
+	private Boolean IDpassed = false;
+	private Boolean PWpassed = false;
+	private Boolean RePWpassed = false;
+	private Boolean Emailpassed = true;
+	private Boolean AMpassed = false;
 
-	public SignFrame(String oriID) {
+	public SignFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("你画我猜-注册");
 		setResizable(false);
-		contentPane = new JPanel();
-		contentPane.setPreferredSize(new Dimension(450,600));
-		contentPane.setLayout(null);
-		contentPane.setOpaque(false);
-		setContentPane(contentPane);
-		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
-		ID = oriID;
-		
-		BackgroundLabel BGL = new BackgroundLabel("src/image/SignBGP.jpg",450,600);
-		this.getRootPane().add(BGL,new Integer(Integer.MIN_VALUE));
 		
 		try {
 			BGMurl = new File("src/music/SignBGM.wav").toURI().toURL();
@@ -60,90 +92,278 @@ public class SignFrame extends JFrame {
 		BGMclip = Applet.newAudioClip(BGMurl);
 		BGMclip.loop();
 		
-		final JLabel NicknameLabel = new JLabel("昵称：");
-		contentPane.add(NicknameLabel);
-		NicknameLabel.setBounds(80, 30, 70, 30);
+		SignBGL = new BackgroundLabel("src/image/SignBGP.jpg",450,600);
+		SigningBGL = new BackgroundLabel("src/image/SigningBGP.jpg",450,600);
+		this.getRootPane().add(SignBGL,new Integer(Integer.MIN_VALUE));
+		this.getRootPane().add(SigningBGL,new Integer(Integer.MIN_VALUE));
+		SignBGL.setVisible(true);
+		SigningBGL.setVisible(false);
 		
-		final JLabel IDLabel = new JLabel("账号：");
-		contentPane.add(IDLabel);
-		IDLabel.setBounds(80, 70, 70, 30);
+		contentPane = new JPanel();
+		contentPane.setPreferredSize(new Dimension(450,600));
+		contentPane.setLayout(null);
+		contentPane.setOpaque(false);
+		setContentPane(contentPane);
+		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
 		
-		final JLabel PasswordLabel = new JLabel("密码：");
-		contentPane.add(PasswordLabel);
-		PasswordLabel.setBounds(80, 110, 70, 30);
+		NickCheckL = new JLabel();
+		NickCheckL.setBounds(380, 60, 20, 20);
+		contentPane.add(NickCheckL);
+		
+		NickTipT = new JTextArea("昵称长度请保持在二到三十个字符");
+		NickTipT.setBounds(120, 80, 250, 40);
+		NickTipT.setForeground(Color.WHITE);
+		NickTipT.setFont(new Font(null,Font.PLAIN,12));
+		NickTipT.setEditable(false);
+		NickTipT.setLineWrap(true);
+		NickTipT.setWrapStyleWord(true);
+		NickTipT.setOpaque(false);
+		contentPane.add(NickTipT);
+		
+		IDCheckL = new JLabel();
+		contentPane.add(IDCheckL);
+		IDCheckL.setBounds(380, 140, 20, 20);
+		
+		IDTipT = new JTextArea("账号应由六到十八位字母和数字组成");
+		IDTipT.setBounds(120, 160, 250, 40);
+		IDTipT.setForeground(Color.WHITE);
+		IDTipT.setFont(new Font(null,Font.PLAIN,12));
+		IDTipT.setEditable(false);
+		IDTipT.setLineWrap(true);
+		IDTipT.setWrapStyleWord(true);
+		IDTipT.setOpaque(false);
+		contentPane.add(IDTipT);
+		
+		PWCheckL = new JLabel();
+		contentPane.add(PWCheckL);
+		PWCheckL.setBounds(380, 220, 20, 20);
+		
+		PWTipT = new JTextArea("密码应由六到十八位字母和数字组成（字母区分大小写）");
+		PWTipT.setBounds(120, 240, 250, 40);
+		//PWTipT.setForeground(Color.WHITE);
+		PWTipT.setFont(new Font(null,Font.PLAIN,12));
+		PWTipT.setEditable(false);
+		PWTipT.setLineWrap(true);
+		PWTipT.setWrapStyleWord(true);
+		PWTipT.setOpaque(false);
+		contentPane.add(PWTipT);
 
-		final JLabel RePasswordLabel = new JLabel("再输一次：");
-		RePasswordLabel.setBounds(80, 150, 70, 30);
-		contentPane.add(RePasswordLabel);
+		RePWCheckL = new JLabel();
+		RePWCheckL.setBounds(380, 300, 20, 20);
+		contentPane.add(RePWCheckL);
 		
-		NicknameField = new JTextField("取个名字呗o(>_<)o ~~",1);
-		contentPane.add(NicknameField);
-		NicknameField.setBounds(150, 30, 200, 30);
-		NicknameField.addFocusListener(new FocusListener(){  
-            public void focusLost(FocusEvent e) {    
-            	if(NicknameField.getText().equals("")){
-            		NicknameField.setText("取个名字呗o(>_<)o ~~");
+		RePWTipT = new JTextArea("请重复输入一遍密码以确认");
+		RePWTipT.setBounds(120, 320, 250, 40);
+		//RePWTipT.setForeground(Color.WHITE);
+		RePWTipT.setFont(new Font(null,Font.PLAIN,12));
+		RePWTipT.setEditable(false);
+		RePWTipT.setLineWrap(true);
+		RePWTipT.setWrapStyleWord(true);
+		RePWTipT.setOpaque(false);
+		contentPane.add(RePWTipT);
+		
+		EmailCheckL = new JLabel();
+		EmailCheckL.setBounds(380, 380, 20, 20);
+		contentPane.add(EmailCheckL);
+		
+		EmailTipT = new JTextArea("请填写一个常用邮箱用于找回密码（选填）");
+		EmailTipT.setBounds(120, 400, 250, 40);
+		//EmailTipT.setForeground(Color.WHITE);
+		EmailTipT.setFont(new Font(null,Font.PLAIN,12));
+		EmailTipT.setEditable(false);
+		EmailTipT.setLineWrap(true);
+		EmailTipT.setWrapStyleWord(true);
+		EmailTipT.setOpaque(false);
+		contentPane.add(EmailTipT);
+		
+		AMCheckBox = new JCheckBox("我已认真阅读并同意");
+		AMCheckBox.setBounds(120, 460, 150, 20);
+		AMCheckBox.setOpaque(false);
+		contentPane.add(AMCheckBox);
+		AMCheckBox.addItemListener(new ItemListener(){
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO 自动生成的方法存根
+				AMpassed = AMCheckBox.isSelected();
+				checkpass();
+			}
+			
+		});
+		
+		Agreement = new JLabel("用户协议");
+		Agreement.setBounds(270, 460, 60, 20);
+		contentPane.add(Agreement);
+		Agreement.addMouseListener(new MouseListener(){
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO 自动生成的方法存根
+				try {
+					Desktop.getDesktop().open(new File("src/text/Agreement.txt"));
+				} catch (IOException e1) {
+					// TODO 自动生成的 catch 块
+					
 				}
+			}
+			@Override
+			public void mouseEntered(MouseEvent arg0) {}
+			@Override
+			public void mouseExited(MouseEvent arg0) {}
+			@Override
+			public void mousePressed(MouseEvent arg0) {}
+			@Override
+			public void mouseReleased(MouseEvent arg0) {}
+		});
+		
+		NickField = new JTextField("取个名字呗o(>_<)o ~~",1);
+		contentPane.add(NickField);
+		NickField.setBounds(120, 50, 250, 30);
+		NickField.addFocusListener(new FocusListener(){  
+            public void focusLost(FocusEvent e) {    
+            	if(NickField.getText().equals("")){
+            		NickCheckL.setIcon(null);
+					NickTipT.setText("昵称长度请保持在二到三十个字符");
+            		NickField.setText("取个名字呗o(>_<)o ~~");
+					Nickpassed = false;
+				} else if (NickField.getText().equals("取个名字呗o(>_<)o ~~")){
+					NickCheckL.setIcon(failTip);
+					NickTipT.setText("你真调皮，你这么调皮你爸妈造吗？");
+					Nickpassed = false;
+				} else if(NickField.getText().length() < 2){
+					NickCheckL.setIcon(failTip);
+					NickTipT.setText("昵称太短了，长度请保持在二到三十个字符");
+					Nickpassed = false;
+				} else if(NickField.getText().length() > 30){
+					NickCheckL.setIcon(failTip);
+					NickTipT.setText("昵称太长了，长度请保持在二到三十个字符");
+					Nickpassed = false;
+				} else{
+					NickCheckL.setIcon(passTip);
+					NickTipT.setText("恭喜！昵称可用！");
+					Nickpassed = true;
+					Nickname = NickField.getText();
+				}
+            	checkpass();
             }
             @Override  
             public void focusGained(FocusEvent arg0) {
-            	if(NicknameField.getText().equals("取个名字呗o(>_<)o ~~")){
-            		NicknameField.setText("");
+            	if(NickField.getText().equals("取个名字呗o(>_<)o ~~")){
+            		NickCheckL.setIcon(null);
+					NickTipT.setText("昵称长度请保持在二到三十个字符");
+            		NickField.setText("");
 				}
             }
 		});
 		
 		IDField = new JTextField(ID,1);
 		contentPane.add(IDField);
-		IDField.setBounds(150, 70, 200, 30);
+		IDField.setBounds(120, 130, 250, 30);
 		IDField.addFocusListener(new FocusListener(){  
             public void focusLost(FocusEvent e) {    
             	if(IDField.getText().equals("")){
-					IDField.setText("编个账号呗o(>_<)o ~~");
+            		IDCheckL.setIcon(null);
+            		IDTipT.setText("账号应由六到十八位字母和数字组成");
+            		IDField.setText("编个账号呗o(>_<)o ~~");
+            		IDpassed = false;
+				} else if (IDField.getText().equals("编个账号呗o(>_<)o ~~")){
+					IDCheckL.setIcon(failTip);
+					IDTipT.setText("你真调皮，你这么调皮你爸妈造吗？");
+					IDpassed = false;
+				} else if(IDField.getText().length() < 6){
+					IDCheckL.setIcon(failTip);
+					IDTipT.setText("账号太短了，长度请保持在六到十八位");
+					IDpassed = false;
+				} else if(IDField.getText().length() > 18){
+					IDCheckL.setIcon(failTip);
+					IDTipT.setText("账号太长了，长度请保持在六到十八位");
+					IDpassed = false;
+				} else{
+					IDCheckL.setIcon(passTip);
+					IDTipT.setText("恭喜！账号可用！");
+					IDpassed = true;
+					ID = IDField.getText();
 				}
+            	checkpass();
             }
             @Override  
             public void focusGained(FocusEvent arg0) {
             	if(IDField.getText().equals("编个账号呗o(>_<)o ~~")){
+            		NickCheckL.setIcon(null);
+					NickTipT.setText("账号应由六到十八位字母和数字组成");
 					IDField.setText("");
 				}
             }
 		});
 		
-		PasswordField = new JPasswordField("",1);
-		contentPane.add(PasswordField);
-		PasswordField.setBounds(150, 110, 200, 30);
+		PWField = new JPasswordField("",1);
+		contentPane.add(PWField);
+		PWField.setBounds(120, 210, 250, 30);
 		
-		RePasswordField = new JPasswordField("",1);
-		contentPane.add(RePasswordField);
-		RePasswordField.setBounds(150, 150, 200, 30);
+		RePWField = new JPasswordField("",1);
+		contentPane.add(RePWField);
+		RePWField.setBounds(120, 290, 250, 30);
+		
+		EmailField = new JTextField("");
+		contentPane.add(EmailField);
+		EmailField.setBounds(120, 370, 250, 30);
 		
 		SubButton = new JButton("确认注册");
 		contentPane.add(SubButton);
-		SubButton.setBounds(80, 210, 120, 40);
+		getRootPane().setDefaultButton(SubButton);
+		SubButton.setBounds(75, 520, 120, 40);
+		SubButton.setEnabled(false);
 		SubButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
 				ID = IDField.getText();
-				Password = String.valueOf(PasswordField.getPassword());
-				BGMclip.stop();
-				Log(ID,Password);
+				Password = String.valueOf(PWField.getPassword());
+				//BGMclip.stop();
+				Sign();
 			}
 		});
 		
 		ResetButton = new JButton("重写");
 		contentPane.add(ResetButton);
-		ResetButton.setBounds(250, 210, 120, 40);
+		ResetButton.setBounds(250, 520, 120, 40);
 		
 		ResetButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
-				NicknameField.setText("取个名字呗o(>_<)o ~~");
+				NickField.setText("取个名字呗o(>_<)o ~~");
 				IDField.setText("编个账号呗o(>_<)o ~~");
-				PasswordField.setText("");
-				RePasswordField.setText("");
+				PWField.setText("");
+				RePWField.setText("");
+			}		
+		});
+		
+		SigningPane = new JPanel();
+		SigningPane.setOpaque(false);
+		SigningPane.setLayout(null);
+		SigningPane.setPreferredSize(new Dimension(400,300));
+		SigningPane.setVisible(false);
+		
+		SigningLabel = new JLabel("正在注册，请稍候...");
+		//SigningLabel.setForeground(Color.WHITE);
+		SigningLabel.setFont(new Font(null,Font.PLAIN,18));
+		SigningLabel.setBounds(80, 220, 300, 30);
+		SigningPane.add(SigningLabel);
+		
+		SigningButton = new JButton("取消");
+		SigningButton.setBounds(150, 400, 150, 50);
+		SigningPane.add(SigningButton);
+		SigningButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自动生成的方法存根
+				if(Signing){
+					cancel();
+				} else {
+					SigningPane.setVisible(false);
+					setContentPane(contentPane);
+					contentPane.setVisible(true);
+				}
 			}		
 		});
 		
@@ -151,10 +371,36 @@ public class SignFrame extends JFrame {
 		setLocationRelativeTo(null);
 	}
 	
-	private void Log(String ID,String Password){
-		setVisible(false);
-		dispose();
-		LogFrame Log = new LogFrame(ID);
-		Log.setVisible(true);
+	private void checkpass(){
+		if(Nickpassed && IDpassed && PWpassed && RePWpassed && Emailpassed && AMpassed){
+			SubButton.setEnabled(true);
+		} else{
+			SubButton.setEnabled(false);
+		}
+	}
+	
+	private void Sign(){
+		//setVisible(false);
+		//dispose();
+		//LogFrame Log = new LogFrame(ID);
+		//Log.setVisible(true);
+		
+		Signing = true;
+		
+		SignBGL.setVisible(false);
+		SigningBGL.setVisible(true);
+		
+		contentPane.setVisible(false);
+		SigningPane.setVisible(true);
+		setContentPane(SigningPane);
+	}
+	
+	private void cancel(){
+		SigningBGL.setVisible(false);
+		SignBGL.setVisible(true);
+		
+		SigningPane.setVisible(false);
+		setContentPane(contentPane);
+		contentPane.setVisible(true);
 	}
 }

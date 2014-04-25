@@ -23,11 +23,8 @@ public class LinkFrame extends JFrame {
 	private JPanel contentPane;
 	private JPanel LinkingPane;
 	private JLabel LinkingLabel;
-	private JLabel TipLab;
-	private JLabel IPLab;
 	private JTextField IPField;
 	private JButton SubButton;
-	private JButton ResetButton;
 	private JButton LogingButton;
 	
 	private URL BGMurl;
