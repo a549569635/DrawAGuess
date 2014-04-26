@@ -44,12 +44,11 @@ public class LogFrame extends JFrame {
 	private AudioClip BGMclip;
 	private Boolean Loging = false;
 
-	public LogFrame(String oriID) {
+	public LogFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Äã»­ÎÒ²Â-µÇÂ½");
 		setResizable(false);
 		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
-		ID = oriID;
 		
 		try {
 			BGMurl = new File("src/music/LogBGM.wav").toURI().toURL();
@@ -72,7 +71,7 @@ public class LogFrame extends JFrame {
 		contentPane.setOpaque(false);
 		setContentPane(contentPane);
 		
-		IDField = new JTextField(ID,1);
+		IDField = new JTextField("",1);
 		contentPane.add(IDField);
 		IDField.setBounds(75, 135, 300, 25);
 		IDField.addFocusListener(new FocusListener(){  

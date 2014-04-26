@@ -110,7 +110,7 @@ public class SignFrame extends JFrame {
 		NickCheckL.setBounds(380, 60, 20, 20);
 		contentPane.add(NickCheckL);
 		
-		NickTipT = new JTextArea("昵称长度请保持在二到三十个字符");
+		NickTipT = new JTextArea("昵称长度请保持在二到十六个字符");
 		NickTipT.setBounds(120, 80, 250, 40);
 		NickTipT.setForeground(Color.WHITE);
 		NickTipT.setFont(new Font(null,Font.PLAIN,12));
@@ -138,7 +138,7 @@ public class SignFrame extends JFrame {
 		contentPane.add(PWCheckL);
 		PWCheckL.setBounds(380, 220, 20, 20);
 		
-		PWTipT = new JTextArea("密码应由六到十八位字母和数字组成（字母区分大小写）");
+		PWTipT = new JTextArea("密码应由六到十八位字母、数字和符号组成（字母区分大小写）");
 		PWTipT.setBounds(120, 240, 250, 40);
 		//PWTipT.setForeground(Color.WHITE);
 		PWTipT.setFont(new Font(null,Font.PLAIN,12));
@@ -162,7 +162,7 @@ public class SignFrame extends JFrame {
 		RePWTipT.setOpaque(false);
 		contentPane.add(RePWTipT);
 		
-		EmailCheckL = new JLabel();
+		EmailCheckL = new JLabel(passTip);
 		EmailCheckL.setBounds(380, 380, 20, 20);
 		contentPane.add(EmailCheckL);
 		
@@ -221,21 +221,21 @@ public class SignFrame extends JFrame {
 		NickField.addFocusListener(new FocusListener(){  
             public void focusLost(FocusEvent e) {    
             	if(NickField.getText().equals("")){
-            		NickCheckL.setIcon(null);
-					NickTipT.setText("昵称长度请保持在二到三十个字符");
+            		NickCheckL.setIcon(failTip);
+					NickTipT.setText("昵称不能为空！昵称长度请保持在二到十六个字符");
             		NickField.setText("取个名字呗o(>_<)o ~~");
 					Nickpassed = false;
 				} else if (NickField.getText().equals("取个名字呗o(>_<)o ~~")){
 					NickCheckL.setIcon(failTip);
-					NickTipT.setText("你真调皮，你这么调皮你爸妈造吗？");
+					NickTipT.setText("你真调皮！你这么调皮你爸妈造吗？");
 					Nickpassed = false;
 				} else if(NickField.getText().length() < 2){
 					NickCheckL.setIcon(failTip);
-					NickTipT.setText("昵称太短了，长度请保持在二到三十个字符");
+					NickTipT.setText("昵称太短了！长度请保持在二到十六个字符");
 					Nickpassed = false;
-				} else if(NickField.getText().length() > 30){
+				} else if(NickField.getText().length() > 16){
 					NickCheckL.setIcon(failTip);
-					NickTipT.setText("昵称太长了，长度请保持在二到三十个字符");
+					NickTipT.setText("昵称太长了！长度请保持在二到十六个字符");
 					Nickpassed = false;
 				} else{
 					NickCheckL.setIcon(passTip);
@@ -249,7 +249,7 @@ public class SignFrame extends JFrame {
             public void focusGained(FocusEvent arg0) {
             	if(NickField.getText().equals("取个名字呗o(>_<)o ~~")){
             		NickCheckL.setIcon(null);
-					NickTipT.setText("昵称长度请保持在二到三十个字符");
+					NickTipT.setText("昵称长度请保持在二到十六个字符");
             		NickField.setText("");
 				}
             }
@@ -261,21 +261,21 @@ public class SignFrame extends JFrame {
 		IDField.addFocusListener(new FocusListener(){  
             public void focusLost(FocusEvent e) {    
             	if(IDField.getText().equals("")){
-            		IDCheckL.setIcon(null);
-            		IDTipT.setText("账号应由六到十八位字母和数字组成");
+            		IDCheckL.setIcon(failTip);
+            		IDTipT.setText("账号不能为空！账号应由六到十八位字母和数字组成");
             		IDField.setText("编个账号呗o(>_<)o ~~");
             		IDpassed = false;
 				} else if (IDField.getText().equals("编个账号呗o(>_<)o ~~")){
 					IDCheckL.setIcon(failTip);
-					IDTipT.setText("你真调皮，你这么调皮你爸妈造吗？");
+					IDTipT.setText("你真调皮！你这么调皮你爸妈造吗？");
 					IDpassed = false;
 				} else if(IDField.getText().length() < 6){
 					IDCheckL.setIcon(failTip);
-					IDTipT.setText("账号太短了，长度请保持在六到十八位");
+					IDTipT.setText("账号太短了！长度请保持在六到十八位");
 					IDpassed = false;
 				} else if(IDField.getText().length() > 18){
 					IDCheckL.setIcon(failTip);
-					IDTipT.setText("账号太长了，长度请保持在六到十八位");
+					IDTipT.setText("账号太长了！长度请保持在六到十八位");
 					IDpassed = false;
 				} else{
 					IDCheckL.setIcon(passTip);
@@ -288,8 +288,8 @@ public class SignFrame extends JFrame {
             @Override  
             public void focusGained(FocusEvent arg0) {
             	if(IDField.getText().equals("编个账号呗o(>_<)o ~~")){
-            		NickCheckL.setIcon(null);
-					NickTipT.setText("账号应由六到十八位字母和数字组成");
+            		IDCheckL.setIcon(null);
+					IDTipT.setText("账号应由六到十八位字母和数字组成");
 					IDField.setText("");
 				}
             }
@@ -298,10 +298,56 @@ public class SignFrame extends JFrame {
 		PWField = new JPasswordField("",1);
 		contentPane.add(PWField);
 		PWField.setBounds(120, 210, 250, 30);
+		PWField.addFocusListener(new FocusListener(){
+			@Override
+			public void focusGained(FocusEvent arg0) {}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				// TODO 自动生成的方法存根
+				if(String.valueOf(PWField.getPassword()).equals("")){
+					PWCheckL.setIcon(failTip);
+					PWTipT.setText("密码不能为空！密码应由六到十八位字母、数字和符号组成");
+					PWpassed = false;
+				} else if(PWField.getPassword().length < 6){
+					PWCheckL.setIcon(failTip);
+					PWTipT.setText("密码太短了！长度请保持在六到十八位");
+					PWpassed = false;
+				} else if(PWField.getPassword().length > 18){
+					PWCheckL.setIcon(failTip);
+					PWTipT.setText("密码太长了！长度请保持在六到十八位");
+					PWpassed = false;
+				} else{
+					PWCheckL.setIcon(passTip);
+					PWTipT.setText("恭喜！密码可用！");
+					PWpassed = true;
+					Password = String.valueOf(PWField.getPassword());
+					System.out.print(Password);
+				}
+            	checkpass();
+			}
+		});
 		
 		RePWField = new JPasswordField("",1);
 		contentPane.add(RePWField);
 		RePWField.setBounds(120, 290, 250, 30);
+		RePWField.addFocusListener(new FocusListener(){
+			@Override
+			public void focusGained(FocusEvent arg0) {}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				// TODO 自动生成的方法存根
+				if(String.valueOf(RePWField.getPassword()).equals(String.valueOf(PWField.getPassword()))){
+					RePWCheckL.setIcon(passTip);
+					RePWTipT.setText("恭喜！确认成功！");
+					RePWpassed = true;
+				} else{
+					RePWCheckL.setIcon(failTip);
+					RePWTipT.setText("确认失败！两次输入密码不一样");
+					RePWpassed = false;
+				}
+            	checkpass();
+			}
+		});
 		
 		EmailField = new JTextField("");
 		contentPane.add(EmailField);
@@ -323,7 +369,7 @@ public class SignFrame extends JFrame {
 			}
 		});
 		
-		ResetButton = new JButton("重写");
+		ResetButton = new JButton("重置");
 		contentPane.add(ResetButton);
 		ResetButton.setBounds(250, 520, 120, 40);
 		
@@ -335,6 +381,18 @@ public class SignFrame extends JFrame {
 				IDField.setText("编个账号呗o(>_<)o ~~");
 				PWField.setText("");
 				RePWField.setText("");
+				EmailField.setText("");
+				NickTipT.setText("昵称长度请保持在二到十六个字符");
+        		IDTipT.setText("账号应由六到十八位字母和数字组成");
+				PWTipT.setText("密码应由六到十八位字母、数字和符号组成（字母区分大小写）");
+				RePWTipT.setText("请重复输入一遍密码以确认");
+				//EmailTipT.setText("请填写一个常用邮箱用于找回密码（选填）");
+				NickCheckL.setIcon(null);
+				IDCheckL.setIcon(null);
+				PWCheckL.setIcon(null);
+				RePWCheckL.setIcon(null);
+				//EmailCheckL.setIcon(null);
+				AMCheckBox.setSelected(false);
 			}		
 		});
 		
@@ -396,6 +454,8 @@ public class SignFrame extends JFrame {
 	}
 	
 	private void cancel(){
+		Signing = false;
+		
 		SigningBGL.setVisible(false);
 		SignBGL.setVisible(true);
 		

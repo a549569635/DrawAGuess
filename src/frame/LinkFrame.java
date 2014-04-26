@@ -6,11 +6,21 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import javax.swing.*;
+
+import core.Driver;
 
 import java.awt.Toolkit;
 
@@ -25,11 +35,12 @@ public class LinkFrame extends JFrame {
 	private JLabel LinkingLabel;
 	private JTextField IPField;
 	private JButton SubButton;
-	private JButton LogingButton;
+	private JButton LinkingButton;
 	
 	private URL BGMurl;
 	private AudioClip BGMclip;
-	private Boolean Linking = false;
+	private Boolean Linked = false;
+	private String ip;
 	
 	public LinkFrame() {
 		setTitle("你画我猜-Link");
@@ -61,13 +72,20 @@ public class LinkFrame extends JFrame {
 		contentPane.add(IPField);
 		IPField.setBounds(70, 85, 200, 30);
 		
-		SubButton = new JButton("Start！");
+		SubButton = new JButton("Link Start！");
 		contentPane.add(SubButton);
-		SubButton.setBounds(100, 145, 100, 30);
+		SubButton.setBounds(90, 145, 120, 30);
 		SubButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
+				LinkBGL.setVisible(false);
+				LinkingBGL.setVisible(true);
+				
+				contentPane.setVisible(false);
+				LinkingPane.setVisible(true);
+				setContentPane(LinkingPane);
+				
 				BGMclip.play();
 				Link();
 			}		
@@ -84,19 +102,17 @@ public class LinkFrame extends JFrame {
 		LinkingLabel.setBounds(75, 78, 300, 30);
 		LinkingPane.add(LinkingLabel);
 		
-		LogingButton = new JButton("取消");
-		LogingButton.setBounds(100, 130, 100, 30);
-		LinkingPane.add(LogingButton);
-		LogingButton.addActionListener(new ActionListener(){
+		LinkingButton = new JButton("取消");
+		LinkingButton.setBounds(100, 130, 100, 30);
+		LinkingPane.add(LinkingButton);
+		LinkingButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
-				if(Linking){
-					cancel();
+				if(Linked){
+					Log();
 				} else {
-					LinkingPane.setVisible(false);
-					setContentPane(contentPane);
-					contentPane.setVisible(true);
+					cancel();
 				}
 			}		
 		});
@@ -106,27 +122,43 @@ public class LinkFrame extends JFrame {
 	}
 	
 	private void Link(){
-		//setVisible(false);
-		//dispose();
-		LogFrame Log = new LogFrame("");
-		Log.setVisible(true);
 		
-		Linking = true;
-		
-		LinkBGL.setVisible(false);
-		LinkingBGL.setVisible(true);
-		
-		contentPane.setVisible(false);
-		LinkingPane.setVisible(true);
-		setContentPane(LinkingPane);
+		try {
+			Driver.soc = new Socket(ip,8888);
+			while(true){
+				Driver.brer = new BufferedReader(new InputStreamReader(Driver.soc.getInputStream()));
+				Driver.bwer = new BufferedWriter(new OutputStreamWriter(Driver.soc.getOutputStream()));
+				
+				Linked = true;
+				LinkingButton.setText("确定");
+				LinkingLabel.setText("连接成功！请点击“确定”进入登陆界面");
+			}
+		} catch (UnknownHostException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
 	}
 	
 	private void cancel(){
+		Driver.soc = null;
+		Driver.brer = null;
+		Driver.bwer = null;
+		
 		LinkingBGL.setVisible(false);
 		LinkBGL.setVisible(true);
 		
 		LinkingPane.setVisible(false);
 		setContentPane(contentPane);
 		contentPane.setVisible(true);
+	}
+	
+	private void Log(){
+		setVisible(false);
+		dispose();
+		LogFrame Log = new LogFrame();
+		Log.setVisible(true);	
 	}
 }
