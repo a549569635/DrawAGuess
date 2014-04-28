@@ -13,11 +13,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -25,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextArea;
@@ -33,6 +32,11 @@ import javax.swing.JTextField;
 import label.BackgroundLabel;
 
 import javax.swing.JCheckBox;
+
+import warpper.Protocol;
+import warpper.User;
+import core.Driver;
+import frame.LogFrame.LogRunnable;
 
 public class SignFrame extends JFrame {
 
@@ -71,7 +75,7 @@ public class SignFrame extends JFrame {
 	private String ID;
 	private String Password;
 	private String Email;
-	private Boolean Signing = false;
+	private Boolean Signed = false;
 	private Boolean Nickpassed = false;
 	private Boolean IDpassed = false;
 	private Boolean PWpassed = false;
@@ -194,25 +198,17 @@ public class SignFrame extends JFrame {
 		Agreement = new JLabel("用户协议");
 		Agreement.setBounds(270, 460, 60, 20);
 		contentPane.add(Agreement);
-		Agreement.addMouseListener(new MouseListener(){
+		Agreement.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				// TODO 自动生成的方法存根
 				try {
 					Desktop.getDesktop().open(new File("src/text/Agreement.txt"));
-				} catch (IOException e1) {
+				} catch (Exception e) {
 					// TODO 自动生成的 catch 块
-					
+					JOptionPane.showMessageDialog(null,"抱歉，用户协议打开失败了");
 				}
 			}
-			@Override
-			public void mouseEntered(MouseEvent arg0) {}
-			@Override
-			public void mouseExited(MouseEvent arg0) {}
-			@Override
-			public void mousePressed(MouseEvent arg0) {}
-			@Override
-			public void mouseReleased(MouseEvent arg0) {}
 		});
 		
 		NickField = new JTextField("取个名字呗o(>_<)o ~~",1);
@@ -321,7 +317,6 @@ public class SignFrame extends JFrame {
 					PWTipT.setText("恭喜！密码可用！");
 					PWpassed = true;
 					Password = String.valueOf(PWField.getPassword());
-					System.out.print(Password);
 				}
             	checkpass();
 			}
@@ -364,7 +359,9 @@ public class SignFrame extends JFrame {
 				// TODO 自动生成的方法存根
 				ID = IDField.getText();
 				Password = String.valueOf(PWField.getPassword());
-				//BGMclip.stop();
+				Nickname = NickField.getText();
+				Email = EmailField.getText();
+				BGMclip.stop();
 				Sign();
 			}
 		});
@@ -415,12 +412,10 @@ public class SignFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
-				if(Signing){
-					cancel();
+				if(Signed){
+					log();
 				} else {
-					SigningPane.setVisible(false);
-					setContentPane(contentPane);
-					contentPane.setVisible(true);
+					cancel();
 				}
 			}		
 		});
@@ -438,23 +433,25 @@ public class SignFrame extends JFrame {
 	}
 	
 	private void Sign(){
-		//setVisible(false);
-		//dispose();
-		//LogFrame Log = new LogFrame(ID);
-		//Log.setVisible(true);
-		
-		Signing = true;
-		
 		SignBGL.setVisible(false);
-		SigningBGL.setVisible(true);
-		
+		SigningBGL.setVisible(true);		
 		contentPane.setVisible(false);
 		SigningPane.setVisible(true);
 		setContentPane(SigningPane);
+		
+		LogRunnable lr = new LogRunnable();
+		Thread thr = new Thread(lr);
+		try {
+			thr.sleep(100);
+			thr.start();
+		} catch (InterruptedException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
 	}
 	
 	private void cancel(){
-		Signing = false;
+		Signed = false;
 		
 		SigningBGL.setVisible(false);
 		SignBGL.setVisible(true);
@@ -462,5 +459,37 @@ public class SignFrame extends JFrame {
 		SigningPane.setVisible(false);
 		setContentPane(contentPane);
 		contentPane.setVisible(true);
+	}
+	
+	private void log(){
+		setVisible(false);
+		dispose();
+		LogFrame log = new LogFrame();
+		log.setVisible(true);
+	}
+	
+	public class LogRunnable implements Runnable{
+		@Override
+		public void run() {
+			// TODO 自动生成的方法存根
+			try {
+				Driver.out.writeObject((Object)new Protocol(2,new User(ID,Password,Nickname,Email)));
+	//System.out.println("注册数据已发出\n");
+				Protocol data = (Protocol) Driver.in.readObject();
+	//System.out.println(data.getPro()+"注册反馈已接受\n");
+				if(data.getPro() == 2){
+					SigningLabel.setText("注册成功！请点击“确定”登陆");
+					SigningButton.setText("确定");
+					Signed = true;
+				}else if(data.getPro() == 21){
+					SigningLabel.setText("注册失败！请点击“确定”返回");
+					SigningButton.setText("确定");
+					//JOptionPane.showMessageDialog(null, "失败");
+				}
+			} catch (Exception e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
+		}
 	}
 }

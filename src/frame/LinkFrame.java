@@ -6,20 +6,21 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
 import javax.swing.*;
 
+import core.ClientSocketRunnable;
 import core.Driver;
 
 import java.awt.Toolkit;
@@ -32,7 +33,7 @@ public class LinkFrame extends JFrame {
 	private BackgroundLabel LinkingBGL;
 	private JPanel contentPane;
 	private JPanel LinkingPane;
-	private JLabel LinkingLabel;
+	private JTextArea LinkingT;
 	private JTextField IPField;
 	private JButton SubButton;
 	private JButton LinkingButton;
@@ -79,13 +80,6 @@ public class LinkFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
-				LinkBGL.setVisible(false);
-				LinkingBGL.setVisible(true);
-				
-				contentPane.setVisible(false);
-				LinkingPane.setVisible(true);
-				setContentPane(LinkingPane);
-				
 				BGMclip.play();
 				Link();
 			}		
@@ -97,10 +91,14 @@ public class LinkFrame extends JFrame {
 		LinkingPane.setPreferredSize(new Dimension(400,300));
 		LinkingPane.setVisible(false);
 		
-		LinkingLabel = new JLabel("正在连接，请稍候...");
-		LinkingLabel.setForeground(Color.WHITE);
-		LinkingLabel.setBounds(75, 78, 300, 30);
-		LinkingPane.add(LinkingLabel);
+		LinkingT = new JTextArea("正在连接，请稍候...");
+		LinkingT.setForeground(Color.WHITE);
+		LinkingT.setBounds(40, 82, 220, 30);
+		LinkingT.setEditable(false);
+		LinkingT.setLineWrap(true);
+		LinkingT.setWrapStyleWord(true);
+		LinkingT.setOpaque(false);
+		LinkingPane.add(LinkingT);
 		
 		LinkingButton = new JButton("取消");
 		LinkingButton.setBounds(100, 130, 100, 30);
@@ -112,7 +110,7 @@ public class LinkFrame extends JFrame {
 				if(Linked){
 					Log();
 				} else {
-					cancel();
+					Cancel();
 				}
 			}		
 		});
@@ -122,30 +120,47 @@ public class LinkFrame extends JFrame {
 	}
 	
 	private void Link(){
+		LinkingButton.setText("取消");
+		LinkingT.setText("正在连接，请稍候...");
+		
+		LinkBGL.setVisible(false);
+		LinkingBGL.setVisible(true);
+		
+		contentPane.setVisible(false);
+		LinkingPane.setVisible(true);
+		setContentPane(LinkingPane);
 		
 		try {
 			Driver.soc = new Socket(ip,8888);
-			while(true){
-				Driver.brer = new BufferedReader(new InputStreamReader(Driver.soc.getInputStream()));
-				Driver.bwer = new BufferedWriter(new OutputStreamWriter(Driver.soc.getOutputStream()));
+			//Driver.soc.setSoTimeout(10000);
+			while(!Linked){
+				Driver.in = new ObjectInputStream(Driver.soc.getInputStream());
+				Driver.out = new ObjectOutputStream(Driver.soc.getOutputStream());
 				
 				Linked = true;
 				LinkingButton.setText("确定");
-				LinkingLabel.setText("连接成功！请点击“确定”进入登陆界面");
+				LinkingT.setText("连接成功！请点击“确定”进入登陆界面");
 			}
+		} catch(SocketTimeoutException e){
+			LinkingButton.setText("确定");
+			LinkingT.setText("连接超时！请点击“确定”返回");
 		} catch (UnknownHostException e) {
 			// TODO 自动生成的 catch 块
+			LinkingButton.setText("确定");
+			LinkingT.setText("找不到服务器！请点击“确定”返回");
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO 自动生成的 catch 块
+			LinkingButton.setText("确定");
+			LinkingT.setText("传输异常！请点击“确定”返回");
 			e.printStackTrace();
 		}
 	}
 	
-	private void cancel(){
+	private void Cancel(){
 		Driver.soc = null;
-		Driver.brer = null;
-		Driver.bwer = null;
+		Driver.in = null;
+		Driver.out = null;
 		
 		LinkingBGL.setVisible(false);
 		LinkBGL.setVisible(true);

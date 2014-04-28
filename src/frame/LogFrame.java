@@ -8,22 +8,42 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import label.BackgroundLabel;
+
 import javax.swing.JCheckBox;
+
+import warpper.Protocol;
+import warpper.User;
+import core.ClientSocketRunnable;
+import core.Driver;
+
 import java.awt.Color;
 
 public class LogFrame extends JFrame {
+	private BufferedReader fbr;
+	private BufferedWriter fbw;
+	public static ClientSocketRunnable client;
 
 	private BackgroundLabel LogBGL;
 	private BackgroundLabel LogingBGL;
@@ -42,7 +62,12 @@ public class LogFrame extends JFrame {
 	private String Password;
 	private URL BGMurl;
 	private AudioClip BGMclip;
-	private Boolean Loging = false;
+	private Boolean Linked = true;
+	private Boolean Loged = false;
+
+	private static File resource = new File("D:\\DrawAndGuess\\resource");
+	private static File autolog = new File("D:\\DrawAndGuess\\resource\\AutoLog.txt");
+	private static File user = new File("D:\\DrawAndGuess\\user");
 
 	public LogFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -116,7 +141,7 @@ public class LogFrame extends JFrame {
 				// TODO 自动生成的方法存根
 				Password = String.valueOf(PasswordField.getPassword());
 				BGMclip.stop();
-				Log(ID,Password);
+				Log();
 			}		
 		});
 		
@@ -150,36 +175,99 @@ public class LogFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
-				if(Loging){
-					cancel();
-				} else {
-					LogingPane.setVisible(false);
-					setContentPane(contentPane);
-					contentPane.setVisible(true);
+				if(Loged){
+					Launch();
+				} else if(Linked){
+					Cancel();
+				} else{
+					System.exit(0);
 				}
 			}		
 		});
 		
+		if(!resource.exists()){
+			try {
+				resource.mkdirs();
+				autolog.createNewFile();
+				//fbw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(autolog)));
+			} catch (Exception e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
+		} else if(!autolog.exists()){
+			try {
+				autolog.createNewFile();
+				//fbw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(autolog)));
+			} catch (Exception e1) {
+				// TODO 自动生成的 catch 块
+				e1.printStackTrace();
+			}
+		} else{
+			try {
+				fbr = new BufferedReader(new InputStreamReader(new FileInputStream(autolog)));
+				String str = fbr.readLine();
+				String[] s = str.split("-");
+				
+				if(s[0].equals("1")){
+					ID = s[1];
+					IDField.setText(ID);
+					Password = s[2];
+					Log();
+				} else if(s[0].equals("0")){
+					ID = s[1];
+					IDField.setText(ID);
+					Password = s[2];
+					PasswordField.setText(Password);
+					remenberCheck.setSelected(true);
+				}
+			} catch (Exception e1) {
+				// TODO 自动生成的 catch 块
+				e1.printStackTrace();
+			} finally{
+				try {
+					fbr.close();
+				} catch (IOException e1) {
+					// TODO 自动生成的 catch 块
+					e1.printStackTrace();
+				}
+			}
+		}
 		pack();
 		setLocationRelativeTo(null);
 	}
 
-	private void Log(String ID, String Password){
+	private void Log(){
 		//setVisible(false);
 		//dispose();
 		//HallFrame hall = new HallFrame();
 		//hall.setVisible(true);
+		//Loged = true;
+		if(remenberCheck.isSelected()){
+			if(autologCheck.isSelected()){
+				SaveAL("1");
+			} else{
+				SaveAL("0");
+			}
+		}
+		
+		IDField.setText("");
+		PasswordField.setText("");
+		
 		LogBGL.setVisible(false);
 		LogingBGL.setVisible(true);
-		
-		Loging = true;
-		
-		LogBGL.setVisible(false);
-		LogingBGL.setVisible(true);
-		
 		contentPane.setVisible(false);
 		LogingPane.setVisible(true);
 		setContentPane(LogingPane);
+		
+		LogRunnable lr = new LogRunnable();
+		Thread thr = new Thread(lr);
+		try {
+			thr.sleep(100);
+			thr.start();
+		} catch (InterruptedException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
 	}
 	
 	private void Sign(){
@@ -189,14 +277,91 @@ public class LogFrame extends JFrame {
 		Sign.setVisible(true);
 	}
 	
-	private void cancel(){
+	private void Cancel(){
 		LogingBGL.setVisible(false);
 		LogBGL.setVisible(true);
-		
-		Loging = false;
 		
 		LogingPane.setVisible(false);
 		setContentPane(contentPane);
 		contentPane.setVisible(true);
+	}
+	
+	private void Launch() {
+		// TODO 自动生成的方法存根
+		setVisible(false);
+		dispose();
+		HallFrame hall = new HallFrame();
+		hall.setVisible(true);
+		
+		try {
+			Driver.client = new ClientSocketRunnable(Driver.soc);
+			// 创建登陆协议
+			new Thread(Driver.client).start();
+
+		} catch (Exception ex) {
+			// TODO Auto-generated catch block
+			ex.printStackTrace();
+		}
+		
+	}
+	
+	private void SaveAL(String s){
+		try {
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("D:\\DrawAndGuess\\resource\\AutoLog.txt")));
+			writer.write(s+"-"+ID+"-"+Password);
+			writer.flush();
+		} catch (Exception e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
+	}
+	
+	public class LogRunnable implements Runnable{
+		@Override
+		public void run() {
+			// TODO 自动生成的方法存根
+			try {
+				Driver.out.writeObject((Object)new Protocol(1,new User(ID,Password)));
+				//setVisible(false);
+				//dispose();
+	//System.out.println("789");
+				while(!Loged){
+					if (Driver.soc == null) {
+						LogingLabel.setText("未连接服务端！请点击“确定”退出");
+						LogingButton.setText("确定");
+						Linked = false;
+						JOptionPane.showMessageDialog(null, "服务端已关闭，请手动关闭");
+						break;
+					}
+					try {
+						Protocol data = (Protocol) Driver.in.readObject();
+System.out.println("登陆反馈已接收"+data.getPro());
+						if (data == null) {
+							continue;
+						}
+						if (data.getPro() == 1) {
+							//Launch();
+							//JOptionPane.showMessageDialog(null,"登陆成功");
+							LogingLabel.setText("登陆成功！请点击“确定”进入游戏大厅");
+							LogingButton.setText("确定");
+							Loged = true;
+						} else if (data.getPro() == 20) {
+							LogingLabel.setText("用户名密码错误！请点击“确定”重新输入");
+							LogingButton.setText("确定");
+						} else if (data.getPro()==25) {
+							LogingLabel.setText("用户已登陆！请点击“确定”返回");
+							LogingButton.setText("确定");
+						}
+
+					} catch (Exception e) {
+						e.printStackTrace();
+						break;
+					}
+				}
+			} catch (Exception e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
+		}
 	}
 }
