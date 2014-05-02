@@ -3,28 +3,22 @@ package frame;
 import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.net.UnknownHostException;
 
 import javax.swing.*;
 
-import core.ClientSocketRunnable;
 import core.Driver;
-
-import java.awt.Toolkit;
-
 import label.BackgroundLabel;
 
 public class LinkFrame extends JFrame {
@@ -38,25 +32,22 @@ public class LinkFrame extends JFrame {
 	private JButton SubButton;
 	private JButton LinkingButton;
 	
-	private URL BGMurl;
 	private AudioClip BGMclip;
 	private Boolean Linked = false;
 	private String ip;
+	private LinkRunnable lr;
+	private Thread thr;
 	
 	public LinkFrame() {
-		setTitle("你画我猜-Link");
+		setTitle("\u4F60\u753B\u6211\u731C-Link");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
+		getRootPane().setDefaultButton(SubButton);
 		
-		try {
-			BGMurl = new File("src/music/LinkBGM.wav").toURI().toURL();
-		} catch (MalformedURLException e1) {
-			// TODO 自动生成的 catch 块
-		}
-		BGMclip = Applet.newAudioClip(BGMurl);
+		BGMclip = Applet.newAudioClip(Driver.class.getResource("/music/LinkBGM.wav"));
 		
-		LinkBGL = new BackgroundLabel("src/image/LinkBGP.jpg",300,200);
-		LinkingBGL = new BackgroundLabel("src/image/LinkingBGP.gif",300,200);
+		LinkBGL = new BackgroundLabel(Driver.class.getResource("/image/LinkBGP.jpg"),300,200);
+		LinkingBGL = new BackgroundLabel(Driver.class.getResource("/image/LinkingBGP.gif"),300,200);
 		this.getRootPane().add(LinkBGL,new Integer(Integer.MIN_VALUE));
 		this.getRootPane().add(LinkingBGL,new Integer(Integer.MIN_VALUE));
 		LinkBGL.setVisible(true);
@@ -67,7 +58,7 @@ public class LinkFrame extends JFrame {
 		contentPane.setLayout(null);
 		contentPane.setOpaque(false);
 		setContentPane(contentPane);
-		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Driver.class.getResource("/image/Logo.png")));
 		
 		IPField = new JTextField("",1);
 		contentPane.add(IPField);
@@ -130,29 +121,13 @@ public class LinkFrame extends JFrame {
 		LinkingPane.setVisible(true);
 		setContentPane(LinkingPane);
 		
+		lr = new LinkRunnable();
+		thr = new Thread(lr);
 		try {
-			Driver.soc = new Socket(ip,8888);
-			//Driver.soc.setSoTimeout(10000);
-			while(!Linked){
-				Driver.in = new ObjectInputStream(Driver.soc.getInputStream());
-				Driver.out = new ObjectOutputStream(Driver.soc.getOutputStream());
-				
-				Linked = true;
-				LinkingButton.setText("确定");
-				LinkingT.setText("连接成功！请点击“确定”进入登陆界面");
-			}
-		} catch(SocketTimeoutException e){
-			LinkingButton.setText("确定");
-			LinkingT.setText("连接超时！请点击“确定”返回");
-		} catch (UnknownHostException e) {
+			thr.sleep(150);
+			thr.run();
+		} catch (Exception e) {
 			// TODO 自动生成的 catch 块
-			LinkingButton.setText("确定");
-			LinkingT.setText("找不到服务器！请点击“确定”返回");
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO 自动生成的 catch 块
-			LinkingButton.setText("确定");
-			LinkingT.setText("传输异常！请点击“确定”返回");
 			e.printStackTrace();
 		}
 	}
@@ -161,6 +136,8 @@ public class LinkFrame extends JFrame {
 		Driver.soc = null;
 		Driver.in = null;
 		Driver.out = null;
+		thr = null;
+		lr = null;
 		
 		LinkingBGL.setVisible(false);
 		LinkBGL.setVisible(true);
@@ -173,7 +150,39 @@ public class LinkFrame extends JFrame {
 	private void Log(){
 		setVisible(false);
 		dispose();
-		LogFrame Log = new LogFrame();
-		Log.setVisible(true);	
+		Driver.logframe = new LogFrame();
+		Driver.logframe.setVisible(true);	
+	}
+	
+	private class LinkRunnable implements Runnable{
+		@Override
+		public void run() {
+			// TODO 自动生成的方法存根
+			try {
+				Driver.soc = new Socket(ip,8888);
+				//Driver.soc.setSoTimeout(10000);
+				while(!Linked){
+					Driver.in = new ObjectInputStream(new BufferedInputStream(Driver.soc.getInputStream()));
+					Driver.out = new ObjectOutputStream(new BufferedOutputStream(Driver.soc.getOutputStream()));
+					
+					Linked = true;
+					LinkingButton.setText("确定");
+					LinkingT.setText("连接成功！请点击“确定”进入登陆界面");
+				}
+			//} catch(SocketTimeoutException e){
+				//LinkingButton.setText("确定");
+				//LinkingT.setText("连接超时！请点击“确定”返回");
+			} catch (UnknownHostException e) {
+				// TODO 自动生成的 catch 块
+				LinkingButton.setText("确定");
+				LinkingT.setText("找不到服务器！请点击“确定”返回");
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO 自动生成的 catch 块
+				LinkingButton.setText("确定");
+				LinkingT.setText("传输异常！请点击“确定”返回");
+				e.printStackTrace();
+			}
+		}
 	}
 }

@@ -14,6 +14,7 @@ public class User implements Serializable, Cloneable {
 	private String Address;
 	private String IP;
 	private int Port;
+	private Image HP;
 
 	public User(String ID,String Password){
 		this.setID(ID);
@@ -133,6 +134,14 @@ public class User implements Serializable, Cloneable {
 
 	public void setPort(int port) {
 		Port = port;
+	}
+
+	public Image getHP() {
+		return HP;
+	}
+
+	public void setHP(Image hP) {
+		HP = hP;
 	}
 
 	@Override

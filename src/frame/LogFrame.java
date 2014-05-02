@@ -12,11 +12,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,6 +41,8 @@ import core.Driver;
 import java.awt.Color;
 
 public class LogFrame extends JFrame {
+	private ObjectInputStream in = Driver.in;
+	private ObjectOutputStream out = Driver.out;
 	private BufferedReader fbr;
 	private BufferedWriter fbw;
 	public static ClientSocketRunnable client;
@@ -64,6 +66,10 @@ public class LogFrame extends JFrame {
 	private AudioClip BGMclip;
 	private Boolean Linked = true;
 	private Boolean Loged = false;
+	private Protocol data;
+	
+	private LogRunnable lr;
+	private Thread thr;
 
 	private static File resource = new File("D:\\DrawAndGuess\\resource");
 	private static File autolog = new File("D:\\DrawAndGuess\\resource\\AutoLog.txt");
@@ -71,20 +77,17 @@ public class LogFrame extends JFrame {
 
 	public LogFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setTitle("你画我猜-登陆");
+		setTitle("\u4F60\u753B\u6211\u731C-\u767B\u9646");
 		setResizable(false);
-		setIconImage(Toolkit.getDefaultToolkit().getImage("src/image/Logo.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Driver.class.getResource("/image/Logo.png")));
+		getRootPane().setDefaultButton(SubButton);
 		
-		try {
-			BGMurl = new File("src/music/LogBGM.wav").toURI().toURL();
-		} catch (MalformedURLException e1) {
-			// TODO 自动生成的 catch 块
-		}
+		BGMurl = Driver.class.getResource("/music/LogBGM.wav");
 		BGMclip = Applet.newAudioClip(BGMurl);
 		BGMclip.loop();
 
-		LogBGL = new BackgroundLabel("src/image/LogBGP.jpg",400,300);
-		LogingBGL = new BackgroundLabel("src/image/LogingBGP.jpg",400,300);
+		LogBGL = new BackgroundLabel(Driver.class.getResource("/image/LogBGP.jpg"),400,300);
+		LogingBGL = new BackgroundLabel(Driver.class.getResource("/image/LogingBGP.jpg"),400,300);
 		this.getRootPane().add(LogBGL,new Integer(Integer.MIN_VALUE));
 		this.getRootPane().add(LogingBGL,new Integer(Integer.MIN_VALUE));
 		LogBGL.setVisible(true);
@@ -120,13 +123,13 @@ public class LogFrame extends JFrame {
 		contentPane.add(PasswordField);
 		PasswordField.setBounds(75, 170, 300, 25);
 
-		remenberCheck = new JCheckBox("保存密码");
+		remenberCheck = new JCheckBox("\u4FDD\u5B58\u5BC6\u7801");
 		remenberCheck.setForeground(Color.WHITE);
 		remenberCheck.setBounds(80, 200, 100, 25);
 		remenberCheck.setOpaque(false);
 		contentPane.add(remenberCheck);
 		
-		autologCheck = new JCheckBox("自动登录");
+		autologCheck = new JCheckBox("\u81EA\u52A8\u767B\u9646");
 		autologCheck.setForeground(Color.WHITE);
 		autologCheck.setBounds(260, 200, 100, 25);
 		autologCheck.setOpaque(false);
@@ -145,7 +148,7 @@ public class LogFrame extends JFrame {
 			}		
 		});
 		
-		RegisterButton = new JButton("新人入伙");
+		RegisterButton = new JButton("\u65B0\u4EBA\u62A5\u5230");
 		contentPane.add(RegisterButton);
 		RegisterButton.setBounds(230, 240, 120, 30);
 		RegisterButton.addActionListener(new ActionListener(){
@@ -250,8 +253,9 @@ public class LogFrame extends JFrame {
 			}
 		}
 		
-		IDField.setText("");
 		PasswordField.setText("");
+		remenberCheck.setSelected(false);
+		autologCheck.setSelected(false);
 		
 		LogBGL.setVisible(false);
 		LogingBGL.setVisible(true);
@@ -259,8 +263,8 @@ public class LogFrame extends JFrame {
 		LogingPane.setVisible(true);
 		setContentPane(LogingPane);
 		
-		LogRunnable lr = new LogRunnable();
-		Thread thr = new Thread(lr);
+		lr = new LogRunnable();
+		thr = new Thread(lr);
 		try {
 			thr.sleep(100);
 			thr.start();
@@ -273,36 +277,39 @@ public class LogFrame extends JFrame {
 	private void Sign(){
 		setVisible(false);
 		dispose();
-		SignFrame Sign = new SignFrame();
-		Sign.setVisible(true);
+		Driver.signframe = new SignFrame();
+		Driver.signframe.setVisible(true);
 	}
 	
 	private void Cancel(){
+		Loged = false;
+		LogingButton.setText("取消");
+		LogingLabel.setText("正在登陆，请稍等...");
 		LogingBGL.setVisible(false);
 		LogBGL.setVisible(true);
-		
 		LogingPane.setVisible(false);
 		setContentPane(contentPane);
 		contentPane.setVisible(true);
+		data = null;
+		thr = null;
+		lr = null;
 	}
 	
 	private void Launch() {
 		// TODO 自动生成的方法存根
 		setVisible(false);
+		//thr.stop();
 		dispose();
-		HallFrame hall = new HallFrame();
-		hall.setVisible(true);
+		Driver.hallframe = new HallFrame();
+		Driver.hallframe.setVisible(true);
 		
 		try {
 			Driver.client = new ClientSocketRunnable(Driver.soc);
-			// 创建登陆协议
 			new Thread(Driver.client).start();
-
 		} catch (Exception ex) {
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
 		}
-		
 	}
 	
 	private void SaveAL(String s){
@@ -316,30 +323,28 @@ public class LogFrame extends JFrame {
 		}
 	}
 	
-	public class LogRunnable implements Runnable{
+	private class LogRunnable implements Runnable{
 		@Override
 		public void run() {
 			// TODO 自动生成的方法存根
 			try {
-				Driver.out.writeObject((Object)new Protocol(1,new User(ID,Password)));
+				out.writeObject((Object)new Protocol(1,new User(ID,Password)));
+				out.flush();
 				//setVisible(false);
 				//dispose();
-	//System.out.println("789");
-				while(!Loged){
-					if (Driver.soc == null) {
-						LogingLabel.setText("未连接服务端！请点击“确定”退出");
-						LogingButton.setText("确定");
-						Linked = false;
-						JOptionPane.showMessageDialog(null, "服务端已关闭，请手动关闭");
-						break;
-					}
+System.out.println("789");
+				if (Driver.soc == null) {
+					LogingLabel.setText("未连接服务端！请点击“确定”退出");
+					LogingButton.setText("确定");
+					Linked = false;
+					//JOptionPane.showMessageDialog(null, "服务端已关闭，请手动关闭");
+					//break;
+				} else {
 					try {
-						Protocol data = (Protocol) Driver.in.readObject();
-System.out.println("登陆反馈已接收"+data.getPro());
+						data = (Protocol) in.readObject();
+						System.out.println("登陆反馈已接收"+data.getPro());
 						if (data == null) {
-							continue;
-						}
-						if (data.getPro() == 1) {
+						} else if (data.getPro() == 1) {
 							//Launch();
 							//JOptionPane.showMessageDialog(null,"登陆成功");
 							LogingLabel.setText("登陆成功！请点击“确定”进入游戏大厅");
@@ -355,7 +360,6 @@ System.out.println("登陆反馈已接收"+data.getPro());
 
 					} catch (Exception e) {
 						e.printStackTrace();
-						break;
 					}
 				}
 			} catch (Exception e) {

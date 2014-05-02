@@ -1,16 +1,21 @@
 package core;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 
-import frame.LinkFrame;
+import warpper.*;
+import frame.*;
 
 public class Driver {
-	private static LinkFrame Link;
+	public static LinkFrame linkframe;
+	public static LogFrame logframe;
+	public static SignFrame signframe;
+	public static HallFrame hallframe;
+	public static GameFrame gameframe;
+	
 	public static Socket soc;
 	public static ClientSocketRunnable client;
 	//public static BufferedOutputStream out;
@@ -23,9 +28,15 @@ public class Driver {
 	private static File temp = new File("D:\\DrawAndGuess\\resource\\temp");
 	private static File newuser;
 	
+	public static HashMap<String,User> CLIENT_NAME=new HashMap<String, User>();
+
+	public static HashMap<String,User> CLIENT_USERS=new HashMap<String, User>();
+
+	public static HashMap<String,User> NEW_USER=new HashMap<String,User>();
+	
 	public static void main(String[] args){
-		Link = new LinkFrame();
-		Link.setVisible(true);
+		linkframe = new LinkFrame();
+		linkframe.setVisible(true);
 	}
 }
 
