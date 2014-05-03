@@ -5,9 +5,12 @@ import label.BackgroundLabel;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.Color;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -32,10 +35,11 @@ public class GameFrame extends JFrame {
 	private JScrollPane msgscroPane;
 	private JTextField textField;
 	private JButton sendButton;
+	private Object[] EXIT_TIP = {"确认退出","继续游戏"};
 	
 	public GameFrame() {
 		setTitle("\u4F60\u753B\u6211\u731C-\u6E38\u620F");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setResizable(false);
 		contentPane = new JPanel();
 		contentPane.setPreferredSize(new Dimension(800,600));
@@ -43,6 +47,17 @@ public class GameFrame extends JFrame {
 		contentPane.setOpaque(false);
 		setContentPane(contentPane);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Driver.class.getResource("/image/Logo.png")));
+		final GameFrame g = this;
+		addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				int i = JOptionPane.showOptionDialog(g, "<html>游戏仍在进行中！<br>确定退出游戏？<html>", "提示",JOptionPane.YES_NO_OPTION, 
+						JOptionPane.INFORMATION_MESSAGE, null, EXIT_TIP, EXIT_TIP[0]);
+				if (i == JOptionPane.YES_OPTION){
+					dispose();
+					System.exit(0);
+				}
+			}
+		});
 		
 		BackgroundLabel BGL = new BackgroundLabel(Driver.class.getResource("/image/GameBGP.jpg"),800,600);
 		this.getRootPane().add(BGL,new Integer(Integer.MIN_VALUE));

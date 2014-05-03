@@ -8,12 +8,10 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import javax.swing.*;
@@ -28,13 +26,13 @@ public class LinkFrame extends JFrame {
 	private JPanel contentPane;
 	private JPanel LinkingPane;
 	private JTextArea LinkingT;
-	private JTextField IPField;
+	//private JTextField IPField;
 	private JButton SubButton;
 	private JButton LinkingButton;
-	
+
 	private AudioClip BGMclip;
 	private Boolean Linked = false;
-	private String ip;
+	private String ip = "127.0.0.1";
 	private LinkRunnable lr;
 	private Thread thr;
 	
@@ -60,13 +58,17 @@ public class LinkFrame extends JFrame {
 		setContentPane(contentPane);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Driver.class.getResource("/image/Logo.png")));
 		
-		IPField = new JTextField("",1);
-		contentPane.add(IPField);
-		IPField.setBounds(70, 85, 200, 30);
+		//IPField = new JTextField("",1);
+		//contentPane.add(IPField);
+		//IPField.setBounds(70, 85, 200, 30);
 		
-		SubButton = new JButton("Link Start！");
+		SubButton = new JButton(new ImageIcon(Driver.class.getResource("/image/LinkButton.png")));
+		SubButton.setRolloverIcon(new ImageIcon(Driver.class.getResource("/image/LinkBR.png")));
+		SubButton.setPressedIcon(new ImageIcon(Driver.class.getResource("/image/LinkBP.png")));
 		contentPane.add(SubButton);
-		SubButton.setBounds(90, 145, 120, 30);
+		SubButton.setContentAreaFilled(false);
+		SubButton.setBorderPainted(false);
+		SubButton.setBounds(90, 90, 120, 30);
 		SubButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -113,10 +115,9 @@ public class LinkFrame extends JFrame {
 	private void Link(){
 		LinkingButton.setText("取消");
 		LinkingT.setText("正在连接，请稍候...");
-		
+		//ip = IPField.getText();
 		LinkBGL.setVisible(false);
 		LinkingBGL.setVisible(true);
-		
 		contentPane.setVisible(false);
 		LinkingPane.setVisible(true);
 		setContentPane(LinkingPane);
@@ -124,8 +125,8 @@ public class LinkFrame extends JFrame {
 		lr = new LinkRunnable();
 		thr = new Thread(lr);
 		try {
-			thr.sleep(150);
-			thr.run();
+			//thr.sleep(150);
+			thr.start();
 		} catch (Exception e) {
 			// TODO 自动生成的 catch 块
 			e.printStackTrace();
@@ -133,7 +134,13 @@ public class LinkFrame extends JFrame {
 	}
 	
 	private void Cancel(){
-		Driver.soc = null;
+		if(Driver.socket != null)
+			try {
+				Driver.socket.close();
+			} catch (IOException e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
 		Driver.in = null;
 		Driver.out = null;
 		thr = null;
@@ -158,12 +165,16 @@ public class LinkFrame extends JFrame {
 		@Override
 		public void run() {
 			// TODO 自动生成的方法存根
-			try {
-				Driver.soc = new Socket(ip,8888);
+			try {				
+				Driver.socket = new Socket(ip,8888);
 				//Driver.soc.setSoTimeout(10000);
 				while(!Linked){
-					Driver.in = new ObjectInputStream(new BufferedInputStream(Driver.soc.getInputStream()));
-					Driver.out = new ObjectOutputStream(new BufferedOutputStream(Driver.soc.getOutputStream()));
+System.out.println("开始新建objOut");
+                    Driver.out = new ObjectOutputStream(Driver.socket.getOutputStream());
+					//Driver.out = this.out;
+System.out.println("开始新建objIn");
+                    Driver.in = new ObjectInputStream(new BufferedInputStream(Driver.socket.getInputStream()));
+					//Driver.in = this.in;
 					
 					Linked = true;
 					LinkingButton.setText("确定");

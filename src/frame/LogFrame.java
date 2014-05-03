@@ -62,7 +62,6 @@ public class LogFrame extends JFrame {
 	
 	private String ID;
 	private String Password;
-	private URL BGMurl;
 	private AudioClip BGMclip;
 	private Boolean Linked = true;
 	private Boolean Loged = false;
@@ -82,8 +81,7 @@ public class LogFrame extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Driver.class.getResource("/image/Logo.png")));
 		getRootPane().setDefaultButton(SubButton);
 		
-		BGMurl = Driver.class.getResource("/music/LogBGM.wav");
-		BGMclip = Applet.newAudioClip(BGMurl);
+		BGMclip = Applet.newAudioClip(Driver.class.getResource("/music/LogBGM.wav"));
 		BGMclip.loop();
 
 		LogBGL = new BackgroundLabel(Driver.class.getResource("/image/LogBGP.jpg"),400,300);
@@ -265,13 +263,8 @@ public class LogFrame extends JFrame {
 		
 		lr = new LogRunnable();
 		thr = new Thread(lr);
-		try {
-			thr.sleep(100);
-			thr.start();
-		} catch (InterruptedException e) {
-			// TODO 自动生成的 catch 块
-			e.printStackTrace();
-		}
+		//thr.sleep(100);
+		thr.start();
 	}
 	
 	private void Sign(){
@@ -298,13 +291,14 @@ public class LogFrame extends JFrame {
 	private void Launch() {
 		// TODO 自动生成的方法存根
 		setVisible(false);
-		//thr.stop();
+		thr = null;
+		lr = null;
 		dispose();
 		Driver.hallframe = new HallFrame();
 		Driver.hallframe.setVisible(true);
 		
 		try {
-			Driver.client = new ClientSocketRunnable(Driver.soc);
+			Driver.client = new ClientSocketRunnable(Driver.socket);
 			new Thread(Driver.client).start();
 		} catch (Exception ex) {
 			// TODO Auto-generated catch block
@@ -328,12 +322,13 @@ public class LogFrame extends JFrame {
 		public void run() {
 			// TODO 自动生成的方法存根
 			try {
-				out.writeObject((Object)new Protocol(1,new User(ID,Password)));
-				out.flush();
+				Driver.self = new User(ID,Password);
+				out.writeObject((Object)new Protocol(1,Driver.self));
+				//out.flush();
 				//setVisible(false);
 				//dispose();
 System.out.println("789");
-				if (Driver.soc == null) {
+				if (Driver.socket == null) {
 					LogingLabel.setText("未连接服务端！请点击“确定”退出");
 					LogingButton.setText("确定");
 					Linked = false;
@@ -347,6 +342,7 @@ System.out.println("789");
 						} else if (data.getPro() == 1) {
 							//Launch();
 							//JOptionPane.showMessageDialog(null,"登陆成功");
+							Driver.self = (User)data.getObj();
 							LogingLabel.setText("登陆成功！请点击“确定”进入游戏大厅");
 							LogingButton.setText("确定");
 							Loged = true;

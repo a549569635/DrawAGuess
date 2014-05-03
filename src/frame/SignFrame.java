@@ -53,7 +53,6 @@ public class SignFrame extends JFrame {
 	private JCheckBox AMCheckBox;
 	private JLabel Agreement;
 
-	private URL BGMurl;
 	private AudioClip BGMclip;
 	private ImageIcon passTip = new ImageIcon(Driver.class.getResource("/image/passTip.png"));
 	private ImageIcon failTip = new ImageIcon(Driver.class.getResource("/image/failTip.png"));
@@ -71,8 +70,7 @@ public class SignFrame extends JFrame {
 		setResizable(false);
 		getRootPane().setDefaultButton(SubButton);
 		
-		BGMurl = Driver.class.getResource("/music/SignBGM.wav");
-		BGMclip = Applet.newAudioClip(BGMurl);
+		BGMclip = Applet.newAudioClip(Driver.class.getResource("/music/SignBGM.wav"));
 		BGMclip.loop();
 		
 		SignBGL = new BackgroundLabel(Driver.class.getResource("/image/SignBGP.jpg"),450,600);
@@ -405,13 +403,8 @@ public class SignFrame extends JFrame {
 		
 		sr = new SignRunnable();
 		thr = new Thread(sr);
-		try {
-			thr.sleep(100);
-			thr.start();
-		} catch (InterruptedException e) {
-			// TODO 自动生成的 catch 块
-			e.printStackTrace();
-		}
+		//thr.sleep(100);
+		thr.start();
 	}
 	
 	private void cancel(){
@@ -430,6 +423,8 @@ public class SignFrame extends JFrame {
 	
 	private void log(){
 		setVisible(false);
+		thr = null;
+		sr = null;
 		BGMclip.stop();
 		dispose();
 		Driver.logframe = new LogFrame();

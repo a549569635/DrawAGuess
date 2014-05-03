@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import warpper.*;
@@ -16,21 +17,22 @@ public class Driver {
 	public static HallFrame hallframe;
 	public static GameFrame gameframe;
 	
-	public static Socket soc;
+	public static Socket socket;
 	public static ClientSocketRunnable client;
-	//public static BufferedOutputStream out;
-	//public static BufferedInputStream in;
 	public static ObjectOutputStream out;
 	public static ObjectInputStream in;
+	
 	private static File drawAG = new File("D:\\DrawAndGuess");
 	private static File resource = new File("D:\\DrawAndGuess\\resource");
 	private static File user = new File("D:\\DrawAndGuess\\user");
 	private static File temp = new File("D:\\DrawAndGuess\\resource\\temp");
 	private static File newuser;
 	
-	public static HashMap<String,User> CLIENT_NAME=new HashMap<String, User>();
+	public static User self;
+	
+	public static ArrayList<User> ONLINE_USER=new ArrayList<User>();
 
-	public static HashMap<String,User> CLIENT_USERS=new HashMap<String, User>();
+	public static HashMap<String,User> CLIENT_SOCKET=new HashMap<String, User>();
 
 	public static HashMap<String,User> NEW_USER=new HashMap<String,User>();
 	

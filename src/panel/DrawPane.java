@@ -238,11 +238,11 @@ public class DrawPane extends JPanel implements Runnable{
 				p1 = e.getPoint();
 				weightBM = weightGroup.getSelection();
 				if(weightBM.equals(weightLarge.getModel())){
-					weight = 13;
+					weight = 10;
 				} else if(weightBM.equals(weightMedium.getModel())){
-					weight = 8;
+					weight = 6;
 				} else if(weightBM.equals(weightSmall.getModel())){
-					weight = 3;
+					weight = 2;
 				}
 				if(flag.equals("ÐÎ×´")){
 					shapeBM = shapeGroup.getSelection();
@@ -287,6 +287,7 @@ public class DrawPane extends JPanel implements Runnable{
 				g2d.setStroke(new BasicStroke(weight));
 				
 				if(flag.equals("»­±Ê")){
+					g2d.setStroke(new BasicStroke(weight+2));
 					g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
 					p1 = p2;
 //System.out.println(p1.x+"\t"+p1.y+"\t"+p2.x+"\t"+p2.y);

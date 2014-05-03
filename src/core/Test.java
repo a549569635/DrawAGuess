@@ -12,9 +12,6 @@ public class Test {
 		
 		HallFrame h = new HallFrame();
 		h.setVisible(true);
-System.out.println(Driver.class.getResource("/text/Agreement.txt").toString());
-System.out.println(Driver.class.getResource("/text/Agreement.txt").getFile());
-System.out.println(Driver.class.getResource("/text/Agreement.txt").getPath());
 	}
 
 }

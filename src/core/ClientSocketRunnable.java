@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.swing.JOptionPane;
 
 import frame.*;
@@ -51,6 +54,9 @@ public class ClientSocketRunnable implements Runnable {
 				Protocol data = (Protocol) objIn.readObject();
 				if (data == null) {
 					continue;
+				}
+				if(data.getPro() == 3){
+					Driver.ONLINE_USER = (ArrayList<User>) data.getObj();
 				}
 				
 				else if(data.getPro()==15){ 

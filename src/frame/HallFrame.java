@@ -1,9 +1,14 @@
 package frame;
 
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.Font;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -12,6 +17,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -29,6 +35,7 @@ import javax.swing.JProgressBar;
 import core.Driver;
 import warpper.*;
 import label.*;
+import javax.swing.ListSelectionModel;
 
 public class HallFrame extends JFrame {
 	private JPanel contentPane;
@@ -56,10 +63,12 @@ public class HallFrame extends JFrame {
 	private User[] roomMates = new User[4];
 	private UserLabel[] userLabel = new UserLabel[4];
 	private ArrayList<RoomLabel> roomList = new ArrayList<RoomLabel>();
+	private AudioClip BGMclip;
+	private Object[] EXIT_TIP = {"确认退出","继续游戏"};
 	
 	public HallFrame() {
 		setTitle("\u4F60\u753B\u6211\u731C-\u6E38\u620F\u5927\u5385");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setResizable(false);
 		contentPane = new JPanel();
 		contentPane.setPreferredSize(new Dimension(800,600));
@@ -68,6 +77,20 @@ public class HallFrame extends JFrame {
 		setContentPane(contentPane);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Driver.class.getResource("/image/Logo.png")));
 		getRootPane().setDefaultButton(sendButton);
+		final HallFrame h = this;
+		addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				int i = JOptionPane.showOptionDialog(h, "确定退出游戏么？", "提示",JOptionPane.YES_NO_OPTION, 
+						JOptionPane.QUESTION_MESSAGE, null, EXIT_TIP, EXIT_TIP[0]);
+				if (i == JOptionPane.YES_OPTION){
+					dispose();
+					System.exit(0);
+				}
+			}
+		});
+		
+		BGMclip = Applet.newAudioClip(Driver.class.getResource("/music/HallBGM.wav"));
+		BGMclip.loop();
 		
 		BackgroundLabel BGL = new BackgroundLabel(Driver.class.getResource("/image/HallBGP.jpg"),800,600);
 		this.getRootPane().add(BGL,new Integer(Integer.MIN_VALUE));
@@ -84,15 +107,15 @@ public class HallFrame extends JFrame {
 		hpLabel.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		infoPane.add(hpLabel);
 		
-		nickLabel = new JLabel("New label");
+		nickLabel = new JLabel("nick name");
 		nickLabel.setBounds(100, 20, 100, 25);
 		infoPane.add(nickLabel);
 		
-		idLabel = new JLabel("New label");
+		idLabel = new JLabel("id");
 		idLabel.setBounds(100, 50, 100, 25);
 		infoPane.add(idLabel);
 		
-		levelLabel = new JLabel("New label");
+		levelLabel = new JLabel("level");
 		levelLabel.setBounds(100, 80, 100, 25);
 		infoPane.add(levelLabel);
 		
@@ -104,12 +127,22 @@ public class HallFrame extends JFrame {
 		expBar.setForeground(new Color(0, 204, 204));
 		expBar.setBounds(10, 140, 180, 14);
 		infoPane.add(expBar);
+
+		nickLabel.setText(Driver.self.getNickname());
+		idLabel.setText(Driver.self.getID());
+		levelLabel.setText("Level"+Driver.self.getLevel());
+		expLabel.setText("Exp:"+Driver.self.getExp()+"/100");
+		expBar.setValue(Driver.self.getExp()%100);
 		
+		userModel = new DefaultTableModel(new Object[][] {},new String[] {"\u7528\u6237\u6635\u79F0", "\u7B49\u7EA7"});
 		usersTable = new JTable();
-		usersTable.setEnabled(false);
+		usersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		usersTable.setCellEditor(null);
+		//usersTable.setEnabled(false);
 		usersTable.setForeground(new Color(153, 0, 0));
-		usersTable.setModel(new DefaultTableModel(new Object[][] {},new String[] {"\u7528\u6237\u6635\u79F0", "\u7B49\u7EA7"}));
-		usersTable.setRowHeight(30);
+		//usersTable
+		usersTable.setModel(userModel);
+		usersTable.setRowHeight(20);
 		
 		usersPane = new JScrollPane(usersTable);
 		usersPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -169,6 +202,13 @@ public class HallFrame extends JFrame {
 		//joinButton.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		joinButton.setEnabled(false);
 		contentPane.add(joinButton);
+		joinButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自动生成的方法存根
+				joinRoom();
+			}
+		});
 		
 		creatButton = new JButton("\u521B\u5EFA\u623F\u95F4");
 		creatButton.setForeground(new Color(153, 51, 0));
@@ -181,12 +221,14 @@ public class HallFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
-				
+				creatRoom();
 			}
 		});
 		
 		pack();
 		setLocationRelativeTo(null);
+		
+		new Thread(new HallRunnable()).start();
 	}
 	
 	private void joinRoom(){
@@ -203,5 +245,46 @@ public class HallFrame extends JFrame {
 			userLabel[i] = new UserLabel(us);
 		}
 		
+	}
+	
+	private void creatRoom(){
+		
+	}
+	
+	private class HallRunnable implements Runnable{
+		@Override
+		public void run() {
+			// TODO 自动生成的方法存根
+			while(true){
+				//if(Driver.socket!=null){
+				//break;
+				// }
+				if(Driver.ONLINE_USER.size()>0){
+					userModel.setRowCount(0);				
+					//循环所有在线用户列表，添加到下拉框中 
+					for(User user:Driver.ONLINE_USER){
+						if(user.getID().equals(Driver.self.getID())){
+							if(!user.equals(Driver.self)){
+								Driver.self = user;
+								nickLabel.setText(Driver.self.getNickname());
+								idLabel.setText(Driver.self.getID());
+								levelLabel.setText("Level"+Driver.self.getLevel());
+								expLabel.setText("Exp:"+Driver.self.getExp()+"/100");
+								expBar.setValue(Driver.self.getExp()%100);
+							}
+						} else{
+							userModel.addRow(new Object[]{user.getNickname(),user.getLevel()});
+						}
+					}
+				}
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		}
 	}
 }
