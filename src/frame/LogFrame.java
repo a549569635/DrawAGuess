@@ -322,8 +322,8 @@ public class LogFrame extends JFrame {
 		public void run() {
 			// TODO 自动生成的方法存根
 			try {
-				Driver.self = new User(ID,Password);
-				out.writeObject((Object)new Protocol(1,Driver.self));
+				Driver.SELF = new User(ID,Password);
+				out.writeObject((Object)new Protocol(1,Driver.SELF));
 				//out.flush();
 				//setVisible(false);
 				//dispose();
@@ -342,7 +342,7 @@ System.out.println("789");
 						} else if (data.getPro() == 1) {
 							//Launch();
 							//JOptionPane.showMessageDialog(null,"登陆成功");
-							Driver.self = (User)data.getObj();
+							Driver.SELF = (User)data.getObj();
 							LogingLabel.setText("登陆成功！请点击“确定”进入游戏大厅");
 							LogingButton.setText("确定");
 							Loged = true;

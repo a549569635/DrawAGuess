@@ -1,5 +1,6 @@
 package core;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -57,15 +58,54 @@ public class ClientSocketRunnable implements Runnable {
 				}
 				if(data.getPro() == 3){
 					Driver.ONLINE_USER = (ArrayList<User>) data.getObj();
+				} else if(data.getPro() == 4){
+					Driver.ONLINE_ROOM = (HashMap<Integer, Room>) data.getObj();
+System.out.println("update Driver.ONLION_ROOM");
+					if(Driver.SELF_ROOM != null){
+						Driver.SELF_ROOM = Driver.ONLINE_ROOM.get(Driver.SELF_ROOM.getID());
+					}
+				} else if(data.getPro() == 5){
+					
+				} else if(data.getPro() == 6){
+					Room room = (Room) data.getObj();
+					Driver.hallframe.joinReady(room);
+				} else if(data.getPro() == 7){
+					Message msg = (Message) data.getObj();
+					if(msg.from.equals(Driver.SELF.getID())){
+						Driver.hallframe.msgArea.append("\n[您]对["+msg.to+"]说："+msg.body);
+					} else if(msg.to.equals(Driver.SELF.getID())){
+						Driver.hallframe.msgArea.append("\n["+msg.from+"]对[您]说："+msg.body);
+						Object obj = msg.from;
+						Driver.hallframe.addAim(obj);
+					} else{
+						Driver.hallframe.msgArea.append("\n["+msg.from+"]说："+msg.body);
+					}
+					Driver.hallframe.msgArea.setCaretPosition(Driver.hallframe.msgArea.getText().length());
+				} else if(data.getPro() == 8){
+					
+				} else if(data.getPro() == 9){
+					
+				} else if(data.getPro() == 10){
+					
 				}
 				
 				else if(data.getPro()==15){ 
 					this.socket=null;
+					JOptionPane.showMessageDialog(null, "抱歉，服务器已关闭，即将退出程序");
+					System.exit(0);
+				} else if(data.getPro() == 22){
+					JOptionPane.showMessageDialog(null, "抱歉，进入房间失败");
+				} else if(data.getPro() == 23){
+					JOptionPane.showMessageDialog(null, "抱歉，创建房间失败");
+				} else if(data.getPro() == 24){
+					JOptionPane.showMessageDialog(null, "抱歉，消息发送失败");
 				}
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "抱歉，出现了一些问题，即将退出程序");
+				System.exit(0);
 				break;
 			}
 		}

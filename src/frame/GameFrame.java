@@ -7,6 +7,8 @@ import java.awt.Toolkit;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,17 +27,24 @@ import javax.swing.border.EtchedBorder;
 
 import core.Driver;
 import panel.DrawPane;
+import panel.ShowPane;
+import java.awt.Font;
 
 public class GameFrame extends JFrame {
-	private JPanel contentPane,tipPane,showPane,infoPane,msgPane,roommatePane;
+	private JPanel contentPane,cdPane,tipPane,infoPane,msgPane,roommatePane;
 	private DrawPane drawPane;
+	private ShowPane showPane;
+	private JLabel cdLabel;
 	private JLabel hpLabel,nickLabel,idLabel,levelLabel,expLabel;
 	private JProgressBar expBar;
-	private JTextArea msgArea;
+	private JLabel timeLabel,tipLabel,roundLabel;
+	public JTextArea msgArea;
 	private JScrollPane msgscroPane;
 	private JTextField textField;
 	private JButton sendButton;
 	private Object[] EXIT_TIP = {"确认退出","继续游戏"};
+	
+	private Thread drawThr,showThr;
 	
 	public GameFrame() {
 		setTitle("\u4F60\u753B\u6211\u731C-\u6E38\u620F");
@@ -69,17 +78,42 @@ public class GameFrame extends JFrame {
 		tipPane.setLayout(null);
 		contentPane.add(tipPane);
 		
+		timeLabel = new JLabel("60");
+		timeLabel.setForeground(new Color(204, 0, 0));
+		timeLabel.setBounds(10, 0, 60, 50);
+		tipPane.add(timeLabel);
+		timeLabel.setFont(new Font("宋体", Font.BOLD, 40));
+		
+		tipLabel = new JLabel("\u63D0\u793A\uFF1A3\u4E2A\u5B57");
+		tipLabel.setFont(new Font("宋体", Font.BOLD, 18));
+		tipLabel.setForeground(new Color(0, 153, 204));
+		tipLabel.setBounds(280, 10, 140, 30);
+		tipPane.add(tipLabel);
+		
+		roundLabel = new JLabel("\u7B2C2/3\u8F6E");
+		roundLabel.setFont(new Font("宋体", Font.BOLD, 18));
+		roundLabel.setBounds(660, 10, 90, 30);
+		tipPane.add(roundLabel);
+		
+		cdPane = new JPanel();
+		cdPane.setBounds(10, 70, 550, 320);
+		cdPane.setLayout(null);
+		contentPane.add(cdPane);
+		
+		cdLabel = new JLabel();
+		cdLabel.setForeground(new Color(153, 0, 0));
+		cdLabel.setFont(new Font("宋体", Font.BOLD, 99));
+		cdLabel.setText("3");
+		cdLabel.setBounds(240, 100, 100, 100);
+		cdPane.add(cdLabel);
+		
 		drawPane = new DrawPane();
 		drawPane.setLocation(10, 70);
 		contentPane.add(drawPane);
 		
-		showPane = new JPanel();
-		showPane.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		showPane.setBounds(10, 70, 550, 320);
-		showPane.setOpaque(false);
-		showPane.setLayout(null);
+		showPane = new ShowPane();
+		showPane.setLocation(10, 70);
 		contentPane.add(showPane);
-		showPane.setVisible(false);
 		
 		infoPane = new JPanel();
 		infoPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u73A9\u5BB6\u4FE1\u606F", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(153, 0, 0)));

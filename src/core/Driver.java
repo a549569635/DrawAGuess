@@ -28,13 +28,15 @@ public class Driver {
 	private static File temp = new File("D:\\DrawAndGuess\\resource\\temp");
 	private static File newuser;
 	
-	public static User self;
+	public static volatile User SELF;
 	
-	public static ArrayList<User> ONLINE_USER=new ArrayList<User>();
+	public static volatile Room SELF_ROOM = null;
+	
+	public static volatile ArrayList<User> ONLINE_USER = new ArrayList<User>();
 
-	public static HashMap<String,User> CLIENT_SOCKET=new HashMap<String, User>();
+	public static volatile HashMap<String,User> CLIENT_SOCKET = new HashMap<String, User>();
 
-	public static HashMap<String,User> NEW_USER=new HashMap<String,User>();
+	public static volatile HashMap<Integer,Room> ONLINE_ROOM = new HashMap<Integer,Room>();
 	
 	public static void main(String[] args){
 		linkframe = new LinkFrame();

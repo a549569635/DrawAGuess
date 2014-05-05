@@ -18,7 +18,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
@@ -57,12 +61,17 @@ public class DrawPane extends JPanel implements Runnable{
 	private String flag = "画笔";
 	ButtonModel weightBM,shapeBM;
 	
+	private ByteArrayOutputStream baos;
+	private DataOutputStream dos;
+	private byte[] data;
+	
 	public DrawPane() {
 		//setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		//setBounds(10, 70, 550, 320);
 		setSize(new Dimension(550,320));
 		setOpaque(false);
 		setLayout(null);
+		this.setVisible(false);
 		
 		g2d.setBackground(Color.WHITE);
 		g2d.clearRect(0, 0, 500, 320);
@@ -89,6 +98,7 @@ public class DrawPane extends JPanel implements Runnable{
 		penButton.setPreferredSize(new Dimension(40, 40));
 		penButton.setBorderPainted(false);
 		penButton.setContentAreaFilled(false);
+		penButton.setToolTipText("画笔工具");
 		toolBar.add(penButton);
 		penButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -105,6 +115,7 @@ public class DrawPane extends JPanel implements Runnable{
 		eraserButton.setPreferredSize(new Dimension(40, 40));
 		eraserButton.setBorderPainted(false);
 		eraserButton.setContentAreaFilled(false);
+		eraserButton.setToolTipText("橡皮工具");
 		toolBar.add(eraserButton);
 		eraserButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -144,6 +155,7 @@ public class DrawPane extends JPanel implements Runnable{
 		shapeButton.setPreferredSize(new Dimension(40, 40));
 		shapeButton.setBorderPainted(false);
 		shapeButton.setContentAreaFilled(false);
+		shapeButton.setToolTipText("<html>图形工具<br>点击可选择形状<html>");
 		toolBar.add(shapeButton);
 		shapeButton.addActionListener(new ActionListener(){
 			@Override
@@ -183,6 +195,7 @@ public class DrawPane extends JPanel implements Runnable{
 		weightButton = new JButton(new ImageIcon(Driver.class.getResource("/image/weight.png")));
 		weightButton.setPreferredSize(new Dimension(40, 40));
 		weightButton.setContentAreaFilled(false);
+		weightButton.setToolTipText("<html>粗细选择<br>点击可设置画笔粗细<html>");
 		toolBar.add(weightButton);
 		weightButton.addActionListener(new ActionListener(){
 			@Override
@@ -195,6 +208,7 @@ public class DrawPane extends JPanel implements Runnable{
 		colorButton = new JButton(new ImageIcon(Driver.class.getResource("/image/color.png")));
 		colorButton.setPreferredSize(new Dimension(40, 40));
 		colorButton.setContentAreaFilled(false);
+		colorButton.setToolTipText("<html>颜色选择<br>点击可设置画笔颜色<html>");
 		toolBar.add(colorButton);
 		colorButton.addActionListener(new ActionListener(){
 			@Override
@@ -208,6 +222,7 @@ public class DrawPane extends JPanel implements Runnable{
 		clearButton = new JButton(new ImageIcon(Driver.class.getResource("/image/clear.png")));
 		clearButton.setPreferredSize(new Dimension(40, 40));
 		clearButton.setContentAreaFilled(false);
+		clearButton.setToolTipText("清空画布");
 		toolBar.add(clearButton);
 		clearButton.addActionListener(new ActionListener(){
 			@Override
@@ -223,6 +238,7 @@ public class DrawPane extends JPanel implements Runnable{
 		colorLabel.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		colorLabel.setOpaque(true);
 		colorLabel.setBackground(color);
+		colorLabel.setToolTipText("<html>当前画笔颜色<br>点击颜色选择按钮可更改<html>");
 		toolBar.add(colorLabel);
 		
 		drawTable.addMouseListener(new MouseAdapter(){
@@ -287,37 +303,34 @@ public class DrawPane extends JPanel implements Runnable{
 				g2d.setStroke(new BasicStroke(weight));
 				
 				if(flag.equals("画笔")){
-					g2d.setStroke(new BasicStroke(weight+2));
 					g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
 					p1 = p2;
+					g2dTemp.drawImage(image, 0, 0, 500, 320, null);
 //System.out.println(p1.x+"\t"+p1.y+"\t"+p2.x+"\t"+p2.y);
 				} else if(flag.equals("橡皮")){
 					g2d.setColor(Color.WHITE);
+					g2d.setStroke(new BasicStroke(weight+2));
 					g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
 					p1 = p2;
+					g2dTemp.drawImage(image, 0, 0, 500, 320, null);
 				} else if(flag.equals("形状")){
 					g2dTemp.setColor(color);
 					g2dTemp.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 					g2dTemp.setStroke(new BasicStroke(weight));
+					g2dTemp.drawImage(image, 0, 0, 500, 320, null);
 //System.out.println(shapeBM.toString());
 					if(shapeBM.equals(shapeLine.getModel())){
 						g2dTemp.drawLine(p1.x, p1.y, p2.x, p2.y);
-						run();
 					} else if(shapeBM.equals(shapeRect.getModel())){
 						g2dTemp.drawRect(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.abs(p2.x-p1.x), Math.abs(p2.y-p1.y));
-						run();
 					} else if(shapeBM.equals(shapeOval.getModel())){
 						g2dTemp.drawOval(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.abs(p2.x-p1.x), Math.abs(p2.y-p1.y));
-						run();
 					} else if(shapeBM.equals(shapefillRect.getModel())){
 						g2dTemp.fillRect(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.abs(p2.x-p1.x), Math.abs(p2.y-p1.y));
-						run();
 					} else if(shapeBM.equals(shapefillOval.getModel())){
 						g2dTemp.fillOval(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.abs(p2.x-p1.x), Math.abs(p2.y-p1.y));
-						run();
 					} 
 				}
-				g2dTemp.drawImage(image, 0, 0, 500, 320, null);
 				
 			}
 			@Override
@@ -331,11 +344,23 @@ public class DrawPane extends JPanel implements Runnable{
 	@Override
 	public void run() {
 		// TODO 自动生成的方法存根
-		try {
-			thr.sleep(150);
-		} catch (InterruptedException e) {
-			// TODO 自动生成的 catch 块
-			e.printStackTrace();
+			try{
+			} catch(Exception e){
+				
+			}
+		while(true){
+			try {
+				dos = new DataOutputStream(Driver.socket.getOutputStream());
+				baos = new ByteArrayOutputStream();
+				ImageIO.write(image, "jpg", baos);
+				data = baos.toByteArray();
+				dos.write(data);
+				dos.close();
+				baos.close();
+			} catch (IOException e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
 		}
 	}
 }
